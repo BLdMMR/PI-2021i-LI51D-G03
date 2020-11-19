@@ -1,8 +1,12 @@
-# Repositório Grupo 3
-## Docente: Luís Falcão 
+# Repositório Trabalho Grupo 3
+## Docente:
+Luís Falcão 
 ## Membros:
-### 44784 - Bernardo Rodrigues
-### 44832 - Hugo Martins
-### 24538 - Marta Fernandes
+ 44784 - Bernardo Rodrigues
 
-Repositório do código dos trabalhos
+
+ 44832 - Hugo Martins
+ 
+ 
+ 24538 - Marta Fernandes
+

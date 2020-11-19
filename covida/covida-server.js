@@ -7,7 +7,7 @@ const web_api = require('./covida-web-api')
 const app = express()
 
 app.get('/api/', web_api.getMostPopularGames)
-app.get('/api/:name', web_api.getGameByName)
+app.get('/api/:name/', web_api.getGameByName)
 app.get('/api/groups/', web_api.getAllGroups)
 app.get('/api/groups/:groupid/', web_api.getGroupInfo)
 app.get('/api/groups/:groupid/:total_rating/', web_api.getGamesFromGroupBasedOnRating)
