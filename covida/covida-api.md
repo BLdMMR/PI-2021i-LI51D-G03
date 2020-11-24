@@ -7,8 +7,8 @@ GET /api/
 - Request:
     - Body: None
 - Response:
-   - Success:
-      - Body example:  
+    - Success:
+         - Body example:  
       ```json
             [
                   {
@@ -90,3 +90,12 @@ GET /api/groups/{group_id}
       ```
 ---
 
+## Get Games From Group Based On Rating
+
+## Create Group
+
+## Add Game To Group
+
+## Remove Game From Group
+
+## Update Group
