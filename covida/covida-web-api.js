@@ -6,10 +6,17 @@ module.exports = function(services) {
 
     function getMostPopularGames(req, rsp) {
         console.log("super slam banana")
-        services.getMostPopularGames(processResponse)
+        console.log(req.query.count)
+        services.getMostPopularGames(0, processResponse)
+        function processResponse(err, data) {
+            rsp.write(data)
+        }
     }
 
     function getGameByName(req, rsp) {
+        console.log("super slam banana by name")
+
+        req.params
         
     }
 
@@ -53,7 +60,4 @@ module.exports = function(services) {
         updateGroup: updateGroup
     }
 
-    function processResponse(err, data, rsp) {
-        rsp.json(data)
-    }
 }

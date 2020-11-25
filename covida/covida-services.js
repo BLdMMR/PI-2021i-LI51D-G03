@@ -1,12 +1,18 @@
 'use strict'
 
+const MAXIMUM_RESULTS = 10000
+
 module.exports = function(igdb_data, covida_db) {
     if (!igdb_data) return "No web-api module found";
     if (!covida_db) return "No covida_db module found";
 
-    function getMostPopularGames(cb) {
+    function getMostPopularGames(num_of_res, cb) {
         console.log("slam banana")
-        return igdb_data.getMostPopularGames(cb);
+        // if (num_of_res > MAXIMUM_RESULTS) num_of_res = MAXIMUM_RESULTS
+        // if (!num_of_res) num_of_res = 25
+        num_of_res = 25
+
+        return igdb_data.getMostPopularGames(num_of_res, cb);
     }
 
     function getGameByName(name, cb) {

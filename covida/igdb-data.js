@@ -10,19 +10,32 @@ const creds = {
 module.exports = function (urllib) {
     if (!urllib) return "No urllib module found"
 
-    function getMostPopularGames(cb) {
+    function getMostPopularGames(num_of_res, cb) {
         console.log('banana')
         urllib.request(base_api_url+'/games', {
             method: 'POST',
             headers: {
                 'Client-ID': creds.client_id,
-                'Authorization': 'Bearer ' + creds.access_token
-            }
-        },cb)
+                'Authorization': `Bearer ${creds.access_token}`
+            },
+            data:`fields name, genres, total_rating, follows; sort follows desc; limit ${num_of_res};`
+        }, cb)
+    }
+
+    function getGameByName(name) {
+        urllib.request(base_api_url+'/games', {
+            method: 'POST',
+            headers: {
+                'Client-ID': creds.client_id,
+                'Authorization': `Bearer ${creds.access_token}`
+            },
+            data:`fields name, genres, total_rating, follows; where name = ${name};`
+        }, cb)
     }
 
     return {
-        getMostPopularGames: getMostPopularGames
+        getMostPopularGames: getMostPopularGames,
+        getGameByName: getGameByName
     }
 
 }
