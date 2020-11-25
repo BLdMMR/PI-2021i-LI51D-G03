@@ -16,11 +16,12 @@ module.exports = function(igdb_data, covida_db) {
     }
 
     function getGameByName(name, cb) {
-       // return igdb_data.getGameByName(name, cb);
+        console.log('slam banana by name')
+        return igdb_data.getGameByName(name, cb);
     }
 
-    function getAllGroups(cb) {
-        //return covida_db.getAllGroups(cb)
+    function getAllGroups(details, cb) {
+        return covida_db.getAllGroups(details, cb)
     }
 
     function getGroupInfo(id, cb) {
@@ -32,7 +33,11 @@ module.exports = function(igdb_data, covida_db) {
     }
 
     function createGroup(group, cb) {
-
+        let details = {
+            name: group.name,
+            description: group.description
+        }
+        covida_db.createGroup(details, cb)
     }
 
     function addGameToGroup() {

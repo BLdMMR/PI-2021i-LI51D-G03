@@ -15,17 +15,20 @@ module.exports = function (urllib) {
         urllib.request(base_api_url+'/games', {
             method: 'POST',
             headers: {
+                'Accept': 'application/json',
                 'Client-ID': creds.client_id,
                 'Authorization': `Bearer ${creds.access_token}`
             },
-            data:`fields name, genres, total_rating, follows; sort follows desc; limit ${num_of_res};`
+            data:`fields name, total_rating, follows;where follows > 0; sort follows desc;`//`fields name, genres, total_rating, follows; sort follows desc; limit ${num_of_res};`
         }, cb)
     }
 
-    function getGameByName(name) {
+    function getGameByName(name, cb) {
+        console.log('banana by name')
         urllib.request(base_api_url+'/games', {
             method: 'POST',
             headers: {
+                'Accept': 'application/json',
                 'Client-ID': creds.client_id,
                 'Authorization': `Bearer ${creds.access_token}`
             },
