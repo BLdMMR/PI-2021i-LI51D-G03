@@ -52,7 +52,7 @@ module.exports = function(services) {
     }
 
     /** Get All Groups
-     * Displays information about all groups createds
+     * Displays information about all groups created
      * @param req
      * @param rsp
      */
@@ -69,7 +69,7 @@ module.exports = function(services) {
     }
 
     function getGroupInfo(req, rsp) {
-        services.createGroup(req.body, processResponse)
+        services.getGroupInfo(req.params.id, processResponse)
 
         function processResponse(err, data) {
             if (err) {

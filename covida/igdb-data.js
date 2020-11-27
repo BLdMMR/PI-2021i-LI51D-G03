@@ -1,5 +1,5 @@
 const base_api_url = "https://api.igdb.com/v4"
-const creds = {
+const credentials = {
     access_token: "4fa2e2xd03b9slsfjacex2yfo9xmbe",
     expires_in: 5462024,
     token_type: "bearer",
@@ -16,8 +16,8 @@ module.exports = function (urllib) {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
-                'Client-ID': creds.client_id,
-                'Authorization': `Bearer ${creds.access_token}`
+                'Client-ID': credentials.client_id,
+                'Authorization': `Bearer ${credentials.access_token}`
             },
             data:`fields name, total_rating, follows;where follows > 0; sort follows desc;`//`fields name, genres, total_rating, follows; sort follows desc; limit ${num_of_res};`
         }, cb)
@@ -29,8 +29,8 @@ module.exports = function (urllib) {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
-                'Client-ID': creds.client_id,
-                'Authorization': `Bearer ${creds.access_token}`
+                'Client-ID': credentials.client_id,
+                'Authorization': `Bearer ${credentials.access_token}`
             },
             data:`fields name, genres, total_rating, follows; where name = ${name};`
         }, cb)

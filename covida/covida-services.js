@@ -12,20 +12,20 @@ module.exports = function(igdb_data, covida_db) {
         // if (!num_of_res) num_of_res = 25
         num_of_res = 25
 
-        return igdb_data.getMostPopularGames(num_of_res, cb);
+        igdb_data.getMostPopularGames(num_of_res, cb);
     }
 
     function getGameByName(name, cb) {
         console.log('slam banana by name')
-        return igdb_data.getGameByName(name, cb);
+        igdb_data.getGameByName(name, cb);
     }
 
     function getAllGroups(details, cb) {
-        return covida_db.getAllGroups(details, cb)
+        covida_db.getAllGroups(details, cb)
     }
 
     function getGroupInfo(id, cb) {
-        //return covida_db.getGroupInfo(id, cb);
+        covida_db.getGroupInfo(id, cb);
     }
 
     function getGamesFromGroupBasedOnRating(min, max, cb) {
