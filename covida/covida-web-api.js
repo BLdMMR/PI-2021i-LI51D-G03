@@ -3,6 +3,7 @@
 /** This is the only module that understands HTTP **/
 
 module.exports = function(services) {
+    if (!services) throw "No services module found"
 
     /** Get Most Popular Games
      * Gets information about the games with the most followers.
@@ -76,7 +77,7 @@ module.exports = function(services) {
                 rsp.error(err)
                 return
             }
-            rsp.json(data)
+            rsp.end(data)
         }
     }
 
@@ -92,17 +93,36 @@ module.exports = function(services) {
                 rsp.error(err)
                 return
             }
+            rsp.statusCode = 200;
             rsp.write("Group created");
-            rsp.json(data);
+            rsp.end(data);
         }
     }
 
     function addGameToGroup(req, rsp) {
+        services.addGameToGroup(req.params.id, req.body, processResponse)
 
+        function processResponse(err, data) {
+            if (err) {
+                rsp.error(err);
+            } else {
+                rsp.write('Game Added to group')
+                rsp.end(data)
+            }
+        }
     }
 
     function removeGameFromGroup(req, rsp) {
+        services.removeGameFromGroup(req.params.name, req.params.gameid, processResponse)
 
+        function processResponse(err, data) {
+            if (err) {
+                rsp.error(err);
+            } else {
+                rsp.write('Game Removed to group')
+                rsp.end(data)
+            }
+        }
     }
 
     function updateGroup(req, rsp) {
@@ -120,5 +140,8 @@ module.exports = function(services) {
         removeGameFromGroup: removeGameFromGroup,
         updateGroup: updateGroup
     }
+
+
+    //TODO-> Review status codes and responses
 
 }

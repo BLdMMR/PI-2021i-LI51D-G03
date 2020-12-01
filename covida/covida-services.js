@@ -3,8 +3,8 @@
 const MAXIMUM_RESULTS = 10000
 
 module.exports = function(igdb_data, covida_db) {
-    if (!igdb_data) return "No web-api module found";
-    if (!covida_db) return "No covida_db module found";
+    if (!igdb_data) throw "No web-api module found";
+    if (!covida_db) throw "No covida_db module found";
 
     function getMostPopularGames(num_of_res, cb) {
         console.log("slam banana")
@@ -29,7 +29,7 @@ module.exports = function(igdb_data, covida_db) {
     }
 
     function getGamesFromGroupBasedOnRating(min, max, cb) {
-        //return covida_db.getGamesFromGroupBasedOnRating(min, max, cb);
+        // covida_db.getGamesFromGroupBasedOnRating(min, max, cb);
     }
 
     function createGroup(group, cb) {
@@ -40,12 +40,12 @@ module.exports = function(igdb_data, covida_db) {
         covida_db.createGroup(details, cb)
     }
 
-    function addGameToGroup() {
-
+    function addGameToGroup(groupName, game, cb) {
+        covida_db.addGameToGroup(groupName, game, cb)
     }
 
-    function removeGameFromGroup() {
-
+    function removeGameFromGroup(groupName, gameId, cb) {
+        covida_db.removeGameFromGroup(groupName, gameId, cb)
     }
 
     function updateGroup() {
@@ -63,4 +63,7 @@ module.exports = function(igdb_data, covida_db) {
         removeGameFromGroup: removeGameFromGroup,
         updateGroup: updateGroup
     }
+
+    //TODO-> Change the callback to do different things if there's error or not
+
 }
