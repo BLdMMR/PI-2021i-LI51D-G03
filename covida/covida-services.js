@@ -48,8 +48,8 @@ module.exports = function(igdb_data, covida_db) {
         covida_db.removeGameFromGroup(groupName, gameId, cb)
     }
 
-    function updateGroup() {
-
+    function updateGroup(groupName, details, cb) {
+        covida_db.updateGroup(groupName, details, cb)
     }
 
     return {

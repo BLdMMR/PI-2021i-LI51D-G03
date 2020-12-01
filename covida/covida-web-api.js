@@ -126,7 +126,16 @@ module.exports = function(services) {
     }
 
     function updateGroup(req, rsp) {
+        services.updateGroup(req.params.id, req.body, processResponse)
 
+        function processResponse(err, data) {
+            if (err) {
+                rsp.error(err);
+            } else {
+                rsp.write('Group Updated')
+                rsp.end(data)
+            }
+        }
     }
 
     return {

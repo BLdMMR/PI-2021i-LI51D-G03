@@ -1,7 +1,7 @@
 'use strict'
 let groups = [];
 let last_idx = -1;
-module.exports =  function (urllib) {
+module.exports =  function () {
     function getAllGroups(cb) {
         let groupNames = []
         groups.forEach(group => groupNames.push(group.name))
@@ -28,7 +28,7 @@ module.exports =  function (urllib) {
     }
 
     function getGamesFromGroupBasedOnRating(min, max, cb) {
-        // covida_db.getGamesFromGroupBasedOnRating(min, max, cb);
+        
     }
 
     function addGameToGroup(groupName, game, cb) {
@@ -56,8 +56,16 @@ module.exports =  function (urllib) {
         }
     }
 
-    function updateGroup() {
-
+    function updateGroup(groupId, details, cb) {
+        let group = findGroup(groupId)
+        if (!group) {
+            cb('No group in database with such name')
+        }
+        else {
+            if(details.name) group.name = details.name
+            if(details.description) group.description = details.description
+            cb(null, group)
+        }
     }
 
 
@@ -68,7 +76,8 @@ module.exports =  function (urllib) {
         createGroup: createGroup,
         getGroupInfo: getGroupInfo,
         addGameToGroup: addGameToGroup,
-        removeGameFromGroup: removeGameFromGroup
+        removeGameFromGroup: removeGameFromGroup,
+        updateGroup: updateGroup
     }
 
     /**
@@ -82,4 +91,6 @@ module.exports =  function (urllib) {
         if (id != null) return  groups.find(grp => grp.id == id);
         throw "No group specified through name or id"
     }
+
+    //TODO-> Add the remaining else clauses to the methods
 }

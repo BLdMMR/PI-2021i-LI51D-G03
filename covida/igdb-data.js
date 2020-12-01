@@ -8,7 +8,7 @@ const credentials = {
 }
 
 module.exports = function (urllib) {
-    if (!urllib) return "No urllib module found"
+    if (!urllib) throw "No urllib module found"
 
     function getMostPopularGames(num_of_res, cb) {
         console.log('banana')
