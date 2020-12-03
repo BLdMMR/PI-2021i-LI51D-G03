@@ -17,14 +17,16 @@ module.exports = function(services) {
         console.log("super slam banana")
         console.log(req.query.count)
         services.getMostPopularGames(0, processResponse)
-        function processResponse(err, data) {
-            console.log(data.toString())
-            if (!err) {
+        function processResponse(err, data, res) {
+            //console.log(data.toString())
+            if (err) {
+
                 rsp.statusCode = 400;
                 rsp.write(`Error: ${err}`)
-                return
             }
-            rsp.write(data)
+            else
+                rsp.statusCode = 200
+            rsp.end(data)
         }
     }
 
@@ -37,17 +39,16 @@ module.exports = function(services) {
      */
     function getGameByName(req, rsp) {
         console.log("super slam banana by name")
-
-        services.getGameByName(req.params.name, processResponse)
+        console.log(req.params.name.toString())
+        services.getGameByName(req.params.name.toString(), processResponse)
 
         function processResponse(err, data) {
             console.log(data.toString())
             if (err) {
                 rsp.statusCode = 400;
-                rsp.write(`Error: ${err}`)
-                return
+                rsp.end(`Error: ${err}`)
             }
-            rsp.write(data);
+            rsp.end(data);
         }
         
     }
@@ -75,14 +76,22 @@ module.exports = function(services) {
         function processResponse(err, data) {
             if (err) {
                 rsp.error(err)
-                return
             }
+            else
             rsp.end(data)
         }
     }
 
     function getGamesFromGroupBasedOnRating(req, rsp) {
+        services.getGamesFromGroupBasedOnRating(req.params.id, req.params.body, processResponse)
 
+        function processResponse(err, data) {
+            if (err) {
+                rsp.error(err)
+            }
+            else
+            rsp.end(data)
+        }
     }
 
     function createGroup(req, rsp) {

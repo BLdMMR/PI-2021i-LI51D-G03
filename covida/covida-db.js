@@ -27,8 +27,15 @@ module.exports =  function () {
         else cb(`No group in database with the name ${name}`)
     }
 
-    function getGamesFromGroupBasedOnRating(min, max, cb) {
-        
+    function getGamesFromGroupBasedOnRating(name, min, max, cb) {
+        let group = findGroup(name);
+        if(!group) cb(`No groups in database with name ${name}`)
+        else {
+            let retGames = group.games
+            retGames.filter(game => {game.total_rating > min && game.total_rating < max});
+            if (retGames.length > 0) cb(null, retGames)
+            else cb(null, `No games in group with ratings withing the values ${min} and ${max}`)
+        }
     }
 
     function addGameToGroup(groupName, game, cb) {

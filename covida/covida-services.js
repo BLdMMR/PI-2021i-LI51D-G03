@@ -28,8 +28,8 @@ module.exports = function(igdb_data, covida_db) {
         covida_db.getGroupInfo(id, cb);
     }
 
-    function getGamesFromGroupBasedOnRating(min, max, cb) {
-        // covida_db.getGamesFromGroupBasedOnRating(min, max, cb);
+    function getGamesFromGroupBasedOnRating(id, details, cb) {
+        covida_db.getGamesFromGroupBasedOnRating(id, details.min, details.max, cb)
     }
 
     function createGroup(group, cb) {
