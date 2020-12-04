@@ -38,9 +38,9 @@ module.exports = function(services) {
      * @param rsp
      */
     function getGameByName(req, rsp) {
-        console.log("super slam banana by name")
-        console.log(req.params.name.toString())
-        services.getGameByName(req.params.name.toString(), processResponse)
+        let name = '"'+req.params.name+'"'
+
+        services.getGameByName(name, processResponse)
 
         function processResponse(err, data) {
             console.log(data.toString())
@@ -63,10 +63,11 @@ module.exports = function(services) {
         function processResponse(err, data) {
             if (err) {
                 rsp.statusCode = 400;
-                rsp.error(err);
-                return
+                rsp.end(err);
+
             }
-            rsp.write(data);
+            else
+            rsp.json(data);
         }
     }
 
@@ -75,61 +76,65 @@ module.exports = function(services) {
 
         function processResponse(err, data) {
             if (err) {
-                rsp.error(err)
+                rsp.json(err)
             }
             else
-            rsp.end(data)
+            rsp.json(data)
         }
     }
 
     function getGamesFromGroupBasedOnRating(req, rsp) {
-        services.getGamesFromGroupBasedOnRating(req.params.id, req.params.body, processResponse)
+        services.getGamesFromGroupBasedOnRating(req.params.id, req.body, processResponse)
 
         function processResponse(err, data) {
             if (err) {
-                rsp.error(err)
+                rsp.json(err)
             }
             else
-            rsp.end(data)
+            rsp.json(data)
         }
     }
 
     function createGroup(req, rsp) {
+        console.log(req.body)
         services.createGroup(req.body, processResponse)
 
         function processResponse(err, data) {
             if (err) {
-                rsp.error(err)
-                return
+                rsp.statusCode = 400
+                rsp.json(err)
+            } else {
+                rsp.statusCode = 200;
+                console.log("Group created");
+                console.log(data)
+                rsp.json(data);
             }
-            rsp.statusCode = 200;
-            rsp.write("Group created");
-            rsp.end(data);
         }
     }
 
     function addGameToGroup(req, rsp) {
+        console.log(req.body)
         services.addGameToGroup(req.params.id, req.body, processResponse)
 
         function processResponse(err, data) {
             if (err) {
-                rsp.error(err);
+                rsp.json(err);
             } else {
-                rsp.write('Game Added to group')
-                rsp.end(data)
+                console.log('Game Added to group')
+                rsp.json(data)
             }
         }
     }
 
     function removeGameFromGroup(req, rsp) {
-        services.removeGameFromGroup(req.params.name, req.params.gameid, processResponse)
+        services.removeGameFromGroup(req.params.id, req.params.gameid, processResponse)
 
         function processResponse(err, data) {
             if (err) {
-                rsp.error(err);
+                rsp.json(err);
             } else {
-                rsp.write('Game Removed to group')
-                rsp.end(data)
+                console.log('Game Removed to group')
+                rsp.json(data)
             }
         }
     }
@@ -139,10 +144,10 @@ module.exports = function(services) {
 
         function processResponse(err, data) {
             if (err) {
-                rsp.error(err);
+                rsp.json(err);
             } else {
-                rsp.write('Group Updated')
-                rsp.end(data)
+                console.log('Group Updated')
+                rsp.json(data)
             }
         }
     }

@@ -1,23 +1,24 @@
 'use strict'
 let groups = [];
-let last_idx = -1;
+let last_idx = 0;
 module.exports =  function () {
     function getAllGroups(cb) {
         let groupNames = []
         groups.forEach(group => groupNames.push(group.name))
-        cb(groupNames)
+        cb(null, groupNames)
     }
 
     function createGroup(details, cb) {
         if (findGroup(details.name)) cb('Group Already in DB')
         else {
-            groups.push({
-                id: ++last_idx,
+            let group = {
+                id: last_idx++,
                 name: details.name,
                 description: details.description,
                 games: []
-            });
-            cb(null, groups[last_idx]);
+            }
+            groups.push(group);
+            cb(null, group);
         }
     }
 
@@ -28,11 +29,12 @@ module.exports =  function () {
     }
 
     function getGamesFromGroupBasedOnRating(name, min, max, cb) {
+        console.log(max)
+        console.log(min)
         let group = findGroup(name);
         if(!group) cb(`No groups in database with name ${name}`)
         else {
-            let retGames = group.games
-            retGames.filter(game => {game.total_rating > min && game.total_rating < max});
+            let retGames = group.games.filter(game => game.total_rating > min && game.total_rating < max);
             if (retGames.length > 0) cb(null, retGames)
             else cb(null, `No games in group with ratings withing the values ${min} and ${max}`)
         }
@@ -54,10 +56,10 @@ module.exports =  function () {
     function removeGameFromGroup(groupName, gameId, cb) {
         let group = findGroup(groupName)
         if (group) {
-            if (!group.games.find(groupElement => game.name.toUpperCase() === groupElement.name.toUpperCase()))
+            if (!group.games.find(groupElement => gameId.toUpperCase() === groupElement.name.toUpperCase()))
                 cb(`The group doesn't have a game with the name ${game.name}`)
             else {
-                group.games.filter(game => game.name != gameId);
+                group.games = group.games.filter(game => game.name !== gameId);
                 cb(null, group.games)
             }
         }
@@ -84,7 +86,9 @@ module.exports =  function () {
         getGroupInfo: getGroupInfo,
         addGameToGroup: addGameToGroup,
         removeGameFromGroup: removeGameFromGroup,
-        updateGroup: updateGroup
+        updateGroup: updateGroup,
+        getGamesFromGroupBasedOnRating: getGamesFromGroupBasedOnRating,
+        loadMock: loadMock
     }
 
     /**
@@ -99,5 +103,51 @@ module.exports =  function () {
         throw "No group specified through name or id"
     }
 
+    function loadMock() {
+        groups = [
+            {
+                id: 1,
+                name: "Best Games",
+                description: "A group of great games",
+                games : [
+                    {id: 1020, name: "Grand Theft Auto V", follows: 1699, total_rating: 93.436101},
+                    {id: 1942, name: "The Witcher 3: Wild Hunt", follows: 1467, total_rating: 93.672166},
+                    {id: 472, name: "The Elder Scrolls V: Skyrim", follows: 1025, total_rating: 91.911974},
+                    {id: 732, name: "Grand Theft Auto: San Andreas", follows: 955, total_rating: 91.757998},
+                    {id: 72, name: "Portal 2", follows: 949, total_rating: 91.885120},
+
+                ]
+            },
+            {
+                id: 2,
+                name: "2nd Best Games",
+                description: "Another group of great games, not as good as he first ones",
+                games : [
+                    {id: 71, name: "Portal", follows: 886, total_rating: 83.538920},
+                    {id: 233, name: "Half-Life 2", follows: 885, total_rating: 90.960823},
+                    {id: 1877, name: "Cyberpunk 2077", follows: 856, total_rating: 0},
+                    {id: 1009, name: "The Last of Us", follows: 835, total_rating: 93.017695},
+                    {id: 74, name: "Mass Effect 2", follows: 785, total_rating: 93.690090},
+
+                ]
+            }
+        ]
+        last_idx = 2
+    }
+
     //TODO-> Add the remaining else clauses to the methods
 }
+
+/* Group Format
+id: ,
+name: ,
+description: ,
+games: []
+* */
+
+/* Game Format
+id: ,
+name: ,
+follows: ,
+total_rating:
+* */

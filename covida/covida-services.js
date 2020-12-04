@@ -33,11 +33,7 @@ module.exports = function(igdb_data, covida_db) {
     }
 
     function createGroup(group, cb) {
-        let details = {
-            name: group.name,
-            description: group.description
-        }
-        covida_db.createGroup(details, cb)
+        covida_db.createGroup(group, cb)
     }
 
     function addGameToGroup(groupName, game, cb) {

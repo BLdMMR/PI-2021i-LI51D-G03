@@ -24,7 +24,6 @@ module.exports = function (urllib) {
     }
 
     function getGameByName(name, cb) {
-        console.log('banana by name')
         urllib.request(base_api_url+'/games', {
             method: 'POST',
             headers: {

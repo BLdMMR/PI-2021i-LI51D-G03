@@ -8,7 +8,11 @@ const covida_db = require('./covida-db.js')()
 const services = require('./covida-services.js')(igdb_data, covida_db)
 const web_api = require('./covida-web-api')(services)
 
+if (process.argv[3] === 'mock') covida_db.loadMock();
+
 const app = express()
+
+app.use(express.json())
 
 app.get('/popular', web_api.getMostPopularGames)
 app.get('/search/:name', web_api.getGameByName)
