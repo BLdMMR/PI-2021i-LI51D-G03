@@ -6,46 +6,109 @@ module.exports = function(igdb_data, covida_db) {
     if (!igdb_data) throw "No web-api module found";
     if (!covida_db) throw "No covida_db module found";
 
-    function getMostPopularGames(num_of_res, cb) {
-        console.log("slam banana")
-        // if (num_of_res > MAXIMUM_RESULTS) num_of_res = MAXIMUM_RESULTS
-        // if (!num_of_res) num_of_res = 25
-        num_of_res = 25
+    function getMostPopularGames(processResponse) {
+        let num_of_results = 15
 
-        igdb_data.getMostPopularGames(num_of_res, cb);
+        igdb_data.getMostPopularGames(num_of_results, processResponse);
     }
 
-    function getGameByName(name, cb) {
-        console.log('slam banana by name')
-        igdb_data.getGameByName(name, cb);
+    function getGameByName(name, processResponse) {
+        if (!name)
+            processResponse({
+                message:"No Name given",
+                statusCode: 400
+            })
+        else
+            igdb_data.getGameByName(name, processResponse);
     }
 
-    function getAllGroups(details, cb) {
-        covida_db.getAllGroups(details, cb)
+    function getAllGroups(processResponse) {
+        covida_db.getAllGroups(processResponse)
     }
 
-    function getGroupInfo(id, cb) {
-        covida_db.getGroupInfo(id, cb);
+    function getGroupInfo(id, processResponse) {
+        if (!id)
+            processResponse({
+                message:"No group id given",
+                statusCode: 400
+            })
+        else
+            covida_db.getGroupInfo(id, processResponse);
     }
 
-    function getGamesFromGroupBasedOnRating(id, details, cb) {
-        covida_db.getGamesFromGroupBasedOnRating(id, details.min, details.max, cb)
+    function getGamesFromGroupBasedOnRating(id, details, processResponse) {
+        if (!id)
+            processResponse({
+                message:"No group id given",
+                statusCode: 400
+            })
+        else if (!details.max)
+            processResponse({
+                message: "No max value given",
+                statusCode: 400
+            })
+        else if (!details.min)
+            processResponse({
+                message: "No min value given",
+                statusCode: 400
+            })
+        else
+            covida_db.getGamesFromGroupBasedOnRating(id, details.min, details.max, processResponse)
     }
 
-    function createGroup(group, cb) {
-        covida_db.createGroup(group, cb)
+    function createGroup(group, processResponse) {
+        if (!group)
+            processResponse({
+                message: "No group details given",
+                statusCode: 400
+            })
+        else
+            covida_db.createGroup(group, processResponse)
     }
 
-    function addGameToGroup(groupName, game, cb) {
-        covida_db.addGameToGroup(groupName, game, cb)
+    function addGameToGroup(groupName, game, processResponse) {
+        if (!groupName)
+            processResponse({
+                message: "No group id given",
+                statusCode: 400
+            })
+        else if (!game)
+            processResponse({
+                message: "No game details given",
+                statusCode: 400
+            })
+        else
+            covida_db.addGameToGroup(groupName, game, processResponse)
     }
 
-    function removeGameFromGroup(groupName, gameId, cb) {
-        covida_db.removeGameFromGroup(groupName, gameId, cb)
+    function removeGameFromGroup(groupName, gameId, processResponse) {
+        if (!groupName)
+            processResponse({
+                message: "No group id given",
+                statusCode: 400
+            })
+        else if (!gameId)
+            processResponse({
+                message: "No game id given",
+                statusCode: 400
+            })
+        else
+            covida_db.removeGameFromGroup(groupName, gameId, processResponse)
     }
 
-    function updateGroup(groupName, details, cb) {
-        covida_db.updateGroup(groupName, details, cb)
+    function updateGroup(groupName, details, processResponse) {
+        if (!groupName)
+            processResponse({
+                message: "No group id given",
+                statusCode: 400
+            })
+        else if (!details)
+            processResponse({
+                message: "No group details given",
+                statusCode: 400
+            })
+        else
+            covida_db.updateGroup(groupName, details, processResponse)
     }
 
     return {
@@ -60,6 +123,5 @@ module.exports = function(igdb_data, covida_db) {
         updateGroup: updateGroup
     }
 
-    //TODO-> Change the callback to do different things if there's error or not
 
 }

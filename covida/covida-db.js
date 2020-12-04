@@ -2,14 +2,25 @@
 let groups = [];
 let last_idx = 0;
 module.exports =  function () {
-    function getAllGroups(cb) {
-        let groupNames = []
-        groups.forEach(group => groupNames.push(group.name))
-        cb(null, groupNames)
+    function getAllGroups(processResponse) {
+        if (groups.length < 0)
+            processResponse({
+                message: "There are no groups in database",
+                statusCode: 404
+            })
+        else {
+            let groupNames = []
+            groups.forEach(group => groupNames.push(group.name))
+            processResponse(null, groupNames)
+        }
     }
 
-    function createGroup(details, cb) {
-        if (findGroup(details.name)) cb('Group Already in DB')
+    function createGroup(details, processResponse) {
+        if (findGroup(details.name))
+            processResponse({
+                message:'Group already in DB',
+                statusCode: 400
+            })
         else {
             let group = {
                 id: last_idx++,
@@ -18,62 +29,88 @@ module.exports =  function () {
                 games: []
             }
             groups.push(group);
-            cb(null, group);
+            processResponse(null, group);
         }
     }
 
-    function getGroupInfo(name, cb) {
-        const group = findGroup(name)
-        if (group) cb(null, group)
-        else cb(`No group in database with the name ${name}`)
+    function getGroupInfo(groupName, processResponse) {
+        const group = findGroup(groupName)
+        if (!group) {
+            processResponse({
+                message: `No group in database with the name ${groupName}`,
+                statusCode: 404
+            })
+        } else {
+            processResponse(null, group)
+        }
     }
 
-    function getGamesFromGroupBasedOnRating(name, min, max, cb) {
-        console.log(max)
-        console.log(min)
-        let group = findGroup(name);
-        if(!group) cb(`No groups in database with name ${name}`)
+    function getGamesFromGroupBasedOnRating(groupName, min, max, processResponse) {
+        let group = findGroup(groupName);
+        if(!group)
+            processResponse({
+                message: `No group in database with name ${groupName}`,
+                statusCode: 404
+            })
         else {
             let retGames = group.games.filter(game => game.total_rating > min && game.total_rating < max);
-            if (retGames.length > 0) cb(null, retGames)
-            else cb(null, `No games in group with ratings withing the values ${min} and ${max}`)
+            if (retGames.length > 0) processResponse(null, retGames)
+            else processResponse(`No games in group with ratings withing the values ${min} and ${max}`)
         }
     }
 
-    function addGameToGroup(groupName, game, cb) {
+    function addGameToGroup(groupName, game, processResponse) {
         let group = findGroup(groupName);
-        if (group) {
+        if (!group) {
+            processResponse({
+                message:`No group in database with the name ${groupName}`,
+                statusCode: 404
+            })
+        } else {
             if (group.games.find(groupElement => game.name.toUpperCase() === groupElement.name.toUpperCase()))
-                cb(`The group already has a game with the name ${game.name}`)
+                processResponse({
+                    message:`The group already has a game with the name ${game.name}`,
+                    statusCode: 400
+                })
             else {
                 group.games.push(game)
-                cb(null, group)
+                processResponse(null, group)
             }
         }
-        else cb(`There is no group with the name ${groupName}`)
     }
 
-    function removeGameFromGroup(groupName, gameId, cb) {
+    function removeGameFromGroup(groupName, gameId, processResponse) {
         let group = findGroup(groupName)
-        if (group) {
-            if (!group.games.find(groupElement => gameId.toUpperCase() === groupElement.name.toUpperCase()))
-                cb(`The group doesn't have a game with the name ${game.name}`)
-            else {
-                group.games = group.games.filter(game => game.name !== gameId);
-                cb(null, group.games)
-            }
+        if (!group) {
+            processResponse({
+                message:`No group in database with the name ${groupName}`,
+                statusCode: 404
+            })
+        }
+        else if (!group.games.find(groupElement => gameId.toUpperCase() === groupElement.name.toUpperCase()))
+            processResponse({
+                message:`The group doesn't have a game with the name ${game.name}`,
+                statusCode:404
+            })
+        else {
+            group.games = group.games.filter(game => game.name !== gameId);
+            processResponse(null, group.games)
         }
     }
 
-    function updateGroup(groupId, details, cb) {
-        let group = findGroup(groupId)
+    function updateGroup(groupName, details, processResponse) {
+        let group = findGroup(groupName)
         if (!group) {
-            cb('No group in database with such name')
+            processResponse({
+                message: `No group in database with the name ${groupName}`,
+                statusCode: 404
+
+            })
         }
         else {
             if(details.name) group.name = details.name
             if(details.description) group.description = details.description
-            cb(null, group)
+            processResponse(null, group)
         }
     }
 
@@ -135,7 +172,6 @@ module.exports =  function () {
         last_idx = 2
     }
 
-    //TODO-> Add the remaining else clauses to the methods
 }
 
 /* Group Format

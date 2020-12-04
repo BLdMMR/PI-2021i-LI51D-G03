@@ -10,8 +10,7 @@ const credentials = {
 module.exports = function (urllib) {
     if (!urllib) throw "No urllib module found"
 
-    function getMostPopularGames(num_of_res, cb) {
-        console.log('banana')
+    function getMostPopularGames(num_of_res, processResponse) {
         urllib.request(base_api_url+'/games', {
             method: 'POST',
             headers: {
@@ -19,11 +18,11 @@ module.exports = function (urllib) {
                 'Client-ID': credentials.client_id,
                 'Authorization': `Bearer ${credentials.access_token}`
             },
-            data:`fields name, total_rating, follows;where follows > 0; sort follows desc;`//`fields name, genres, total_rating, follows; sort follows desc; limit ${num_of_res};`
-        }, cb)
+            data:`fields name, total_rating, follows;where follows > 0; sort follows desc;`
+        }, processResponse)
     }
 
-    function getGameByName(name, cb) {
+    function getGameByName(name, processResponse) {
         urllib.request(base_api_url+'/games', {
             method: 'POST',
             headers: {
@@ -32,7 +31,7 @@ module.exports = function (urllib) {
                 'Authorization': `Bearer ${credentials.access_token}`
             },
             data:`fields name, genres, total_rating, follows; where name = ${name};`
-        }, cb)
+        }, processResponse)
     }
 
     return {

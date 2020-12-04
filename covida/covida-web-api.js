@@ -9,24 +9,20 @@ module.exports = function(services) {
      * Gets information about the games with the most followers.
      * It's limited to the top 25 games. Feature is aligned to let
      * user choose the number of results to display
-     * TODO-> read from querystring the amout of results to display
      * @param req
      * @param rsp
      */
     function getMostPopularGames(req, rsp) {
-        console.log("super slam banana")
-        console.log(req.query.count)
-        services.getMostPopularGames(0, processResponse)
+        services.getMostPopularGames(processResponse)
         function processResponse(err, data, res) {
-            //console.log(data.toString())
             if (err) {
-
-                rsp.statusCode = 400;
-                rsp.write(`Error: ${err}`)
+                rsp.statusCode = err.statusCode;
+                rsp.json(err.message)
             }
-            else
+            else {
                 rsp.statusCode = 200
-            rsp.end(data)
+                rsp.json(JSON.parse(data))
+            }
         }
     }
 
@@ -43,12 +39,14 @@ module.exports = function(services) {
         services.getGameByName(name, processResponse)
 
         function processResponse(err, data) {
-            console.log(data.toString())
             if (err) {
-                rsp.statusCode = 400;
-                rsp.end(`Error: ${err}`)
+                rsp.statusCode = err.statusCode;
+                rsp.json(err.message)
             }
-            rsp.end(data);
+            else {
+                rsp.statusCode = 200
+                rsp.json(JSON.parse(data));
+            }
         }
         
     }
@@ -60,14 +58,17 @@ module.exports = function(services) {
      */
     function getAllGroups(req, rsp) {
         services.getAllGroups(processResponse);
+
         function processResponse(err, data) {
             if (err) {
-                rsp.statusCode = 400;
-                rsp.end(err);
+                rsp.statusCode = err.statusCode;
+                rsp.json(err.message);
 
             }
-            else
-            rsp.json(data);
+            else {
+                rsp.statusCode = 200
+                rsp.json(data);
+            }
         }
     }
 
@@ -76,10 +77,13 @@ module.exports = function(services) {
 
         function processResponse(err, data) {
             if (err) {
-                rsp.json(err)
+                rsp.statusCode = err.statusCode
+                rsp.json(err.message)
             }
-            else
-            rsp.json(data)
+            else {
+                rsp.statusCode = 200
+                rsp.json(data)
+            }
         }
     }
 
@@ -88,39 +92,41 @@ module.exports = function(services) {
 
         function processResponse(err, data) {
             if (err) {
-                rsp.json(err)
+                rsp.statusCode = err.statusCode
+                rsp.json(err.message)
             }
-            else
-            rsp.json(data)
+            else {
+                rsp.statusCode = 200
+                rsp.json(data)
+            }
         }
     }
 
     function createGroup(req, rsp) {
-        console.log(req.body)
         services.createGroup(req.body, processResponse)
 
         function processResponse(err, data) {
             if (err) {
-                rsp.statusCode = 400
-                rsp.json(err)
+                rsp.statusCode = err.statusCode
+                rsp.json(err.message)
             } else {
-                rsp.statusCode = 200;
+                rsp.statusCode = 201;
                 console.log("Group created");
-                console.log(data)
                 rsp.json(data);
             }
         }
     }
 
     function addGameToGroup(req, rsp) {
-        console.log(req.body)
         services.addGameToGroup(req.params.id, req.body, processResponse)
 
         function processResponse(err, data) {
             if (err) {
-                rsp.json(err);
+                rsp.statusCode = err.statusCode
+                rsp.json(err.message);
             } else {
                 console.log('Game Added to group')
+                rsp.statusCode = 201
                 rsp.json(data)
             }
         }
@@ -131,9 +137,11 @@ module.exports = function(services) {
 
         function processResponse(err, data) {
             if (err) {
-                rsp.json(err);
+                rsp.statusCode = err.statusCode
+                rsp.json(err.message);
             } else {
                 console.log('Game Removed to group')
+                rsp.statusCode = 200
                 rsp.json(data)
             }
         }
@@ -144,9 +152,11 @@ module.exports = function(services) {
 
         function processResponse(err, data) {
             if (err) {
-                rsp.json(err);
+                rsp.statusCode = err.statusCode
+                rsp.json(err.message);
             } else {
                 console.log('Group Updated')
+                rsp.statusCode = 200
                 rsp.json(data)
             }
         }
@@ -163,8 +173,5 @@ module.exports = function(services) {
         removeGameFromGroup: removeGameFromGroup,
         updateGroup: updateGroup
     }
-
-
-    //TODO-> Review status codes and responses
 
 }
