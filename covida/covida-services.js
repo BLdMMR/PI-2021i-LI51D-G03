@@ -42,18 +42,18 @@ module.exports = function(igdb_data, covida_db) {
                 message:"No group id given",
                 statusCode: 400
             })
-        else if (!details.max)
+        else if (!parseInt(details.max))
             processResponse({
                 message: "No max value given",
                 statusCode: 400
             })
-        else if (!details.min)
+        else if (!parseInt(details.min))
             processResponse({
                 message: "No min value given",
                 statusCode: 400
             })
         else
-            covida_db.getGamesFromGroupBasedOnRating(id, details.min, details.max, processResponse)
+            covida_db.getGamesFromGroupBasedOnRating(id, parseInt(details.min), parseInt(details.max), processResponse)
     }
 
     function createGroup(group, processResponse) {

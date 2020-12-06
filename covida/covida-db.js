@@ -9,9 +9,9 @@ module.exports =  function () {
                 statusCode: 404
             })
         else {
-            let groupNames = []
-            groups.forEach(group => groupNames.push(group.name))
-            processResponse(null, groupNames)
+            let groupList = []
+            groups.forEach(group => groupList.push({name: group.name, description: group.description, number_of_games: group.games.length}))
+            processResponse(null, groupList)
         }
     }
 
@@ -46,6 +46,13 @@ module.exports =  function () {
     }
 
     function getGamesFromGroupBasedOnRating(groupName, min, max, processResponse) {
+        if (min > max) {
+            processResponse({
+                    message: "Minimum value bigger than maximum",
+                    statusCode: 400
+                }
+            )
+        }
         let group = findGroup(groupName);
         if(!group)
             processResponse({
@@ -55,7 +62,10 @@ module.exports =  function () {
         else {
             let retGames = group.games.filter(game => game.total_rating > min && game.total_rating < max);
             if (retGames.length > 0) processResponse(null, retGames)
-            else processResponse(`No games in group with ratings withing the values ${min} and ${max}`)
+            else processResponse({
+                message: `No games in group with ratings withing the values ${min} and ${max}`,
+                statusCode: 404
+            })
         }
     }
 
@@ -87,9 +97,9 @@ module.exports =  function () {
                 statusCode: 404
             })
         }
-        else if (!group.games.find(groupElement => gameId.toUpperCase() === groupElement.name.toUpperCase()))
+        else if (!group.games.find(groupElement => gameId === groupElement.name))
             processResponse({
-                message:`The group doesn't have a game with the name ${game.name}`,
+                message:`The group doesn't have a game with the name ${gameId}`,
                 statusCode:404
             })
         else {

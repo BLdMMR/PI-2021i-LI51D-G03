@@ -14,6 +14,7 @@ const app = express()
 
 app.use(express.json())
 
+app.get('/api', apiDesc)
 app.get('/popular', web_api.getMostPopularGames)
 app.get('/search/:name', web_api.getGameByName)
 app.get('/api/groups', web_api.getAllGroups)
@@ -26,6 +27,15 @@ app.put('/api/groups/:id', web_api.updateGroup)
 
 app.listen(PORT)
 
+function apiDesc(req, rsp) {
+    console.log(req.path)
+    rsp.status(200)
+        .json({
+            name: 'Chelas Open Videogame Application',
+            version: '1.0.0',
+            description: 'PI Project Application'
+        })
+}
 
 
 
