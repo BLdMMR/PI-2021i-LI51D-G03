@@ -16,7 +16,7 @@ module.exports =  function () {
     }
 
     function createGroup(details, processResponse) {
-        if (findGroup(details.name))
+        if (findGroup(null, details.name))
             processResponse({
                 message:'Group already in DB',
                 statusCode: 400
@@ -33,11 +33,11 @@ module.exports =  function () {
         }
     }
 
-    function getGroupInfo(groupName, processResponse) {
-        const group = findGroup(groupName)
+    function getGroupInfo(groupId, processResponse) {
+        const group = findGroup(groupId)
         if (!group) {
             processResponse({
-                message: `No group in database with the name ${groupName}`,
+                message: `No group in database with the name ${groupId}`,
                 statusCode: 404
             })
         } else {
@@ -45,7 +45,7 @@ module.exports =  function () {
         }
     }
 
-    function getGamesFromGroupBasedOnRating(groupName, min, max, processResponse) {
+    function getGamesFromGroupBasedOnRating(groupId, min, max, processResponse) {
         if (min > max) {
             processResponse({
                     message: "Minimum value bigger than maximum",
@@ -53,10 +53,10 @@ module.exports =  function () {
                 }
             )
         }
-        let group = findGroup(groupName);
+        let group = findGroup(groupId);
         if(!group)
             processResponse({
-                message: `No group in database with name ${groupName}`,
+                message: `No group in database with name ${groupId}`,
                 statusCode: 404
             })
         else {
@@ -69,11 +69,11 @@ module.exports =  function () {
         }
     }
 
-    function addGameToGroup(groupName, game, processResponse) {
-        let group = findGroup(groupName);
+    function addGameToGroup(groupId, game, processResponse) {
+        let group = findGroup(groupId);
         if (!group) {
             processResponse({
-                message:`No group in database with the name ${groupName}`,
+                message:`No group in database with the name ${groupId}`,
                 statusCode: 404
             })
         } else {
@@ -89,11 +89,11 @@ module.exports =  function () {
         }
     }
 
-    function removeGameFromGroup(groupName, gameId, processResponse) {
-        let group = findGroup(groupName)
+    function removeGameFromGroup(groupId, gameId, processResponse) {
+        let group = findGroup(groupId)
         if (!group) {
             processResponse({
-                message:`No group in database with the name ${groupName}`,
+                message:`No group in database with the name ${groupId}`,
                 statusCode: 404
             })
         }
@@ -108,11 +108,11 @@ module.exports =  function () {
         }
     }
 
-    function updateGroup(groupName, details, processResponse) {
-        let group = findGroup(groupName)
+    function updateGroup(groupId, details, processResponse) {
+        let group = findGroup(groupId)
         if (!group) {
             processResponse({
-                message: `No group in database with the name ${groupName}`,
+                message: `No group in database with the name ${groupId}`,
                 statusCode: 404
 
             })
@@ -144,7 +144,7 @@ module.exports =  function () {
      * @param id
      * @returns {*}
      */
-    function findGroup(name, id) {
+    function findGroup(id, name) {
         if (name != null) return  groups.find(grp => grp.name.toUpperCase() === name.toUpperCase());
         if (id != null) return  groups.find(grp => grp.id == id);
         throw "No group specified through name or id"
