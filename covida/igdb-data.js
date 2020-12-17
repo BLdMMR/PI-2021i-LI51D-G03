@@ -16,7 +16,7 @@ module.exports = function (urllib) {
             headers: {
                 'Accept': 'application/json',
                 'Client-ID': credentials.client_id,
-                'Authorization': `Bearer ${credentials.access_token}`
+                'Authorization': `Bearer${credentials.access_token}`
             },
             data:`fields name, total_rating, follows;where follows > 0; sort follows desc;`
         }, processResponse)

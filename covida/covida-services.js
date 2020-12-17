@@ -6,10 +6,10 @@ module.exports = function(igdb_data, covida_db) {
     if (!igdb_data) throw "No web-api module found";
     if (!covida_db) throw "No covida_db module found";
 
-    function getMostPopularGames(processResponse) {
+    function getMostPopularGames() {
         let num_of_results = 15
 
-        igdb_data.getMostPopularGames(num_of_results, processResponse);
+        return igdb_data.getMostPopularGames(num_of_results);
     }
 
     function getGameByName(name, processResponse) {
@@ -18,8 +18,15 @@ module.exports = function(igdb_data, covida_db) {
                 message:"No Name given",
                 statusCode: 400
             })
-        else
-            igdb_data.getGameByName(name, processResponse);
+        else{
+            let formatedName = '"'+
+                name.
+                split("_").
+                reduce((stringToFrom, currentWord) => stringToFrom + ' ' + currentWord) +
+                '"'
+            igdb_data.getGameByName(formatedName, processResponse);
+        }
+
     }
 
     function getAllGroups(processResponse) {
@@ -66,6 +73,15 @@ module.exports = function(igdb_data, covida_db) {
             covida_db.createGroup(group, processResponse)
     }
 
+    function removeGroup(groupId, processResponse) {
+        if (!groupId) processResponse({
+            message:"No group id given",
+            statusCode: 400
+        })
+        else
+            covida_db.removeGroup(groupId, processResponse)
+    }
+
     function addGameToGroup(groupName, game, processResponse) {
         if (!groupName)
             processResponse({
@@ -92,8 +108,12 @@ module.exports = function(igdb_data, covida_db) {
                 message: "No game id given",
                 statusCode: 400
             })
-        else
-            covida_db.removeGameFromGroup(groupName, gameId, processResponse)
+        else{
+            let formatedName = gameId.
+                split("_").
+                reduce((stringToFrom, currentWord) => stringToFrom + ' ' + currentWord)
+            covida_db.removeGameFromGroup(groupName, formatedName, processResponse)
+        }
     }
 
     function updateGroup(groupName, details, processResponse) {
@@ -118,6 +138,7 @@ module.exports = function(igdb_data, covida_db) {
         getGroupInfo: getGroupInfo,
         getGamesFromGroupBasedOnRating: getGamesFromGroupBasedOnRating,
         createGroup: createGroup,
+        removeGroup: removeGroup,
         addGameToGroup: addGameToGroup,
         removeGameFromGroup: removeGameFromGroup,
         updateGroup: updateGroup

@@ -5,38 +5,33 @@
 module.exports = function(services) {
     if (!services) throw "No services module found"
 
-    /** Get Most Popular Games
-     * Gets information about the games with the most followers.
-     * It's limited to the top 25 games. Feature is aligned to let
-     * user choose the number of results to display
-     * @param req
-     * @param rsp
-     */
     function getMostPopularGames(req, rsp) {
-        services.getMostPopularGames(processResponse)
-        function processResponse(err, data, res) {
-            if (err) {
-                rsp.status(err.statusCode)
-                   .json(err.message)
-            }
-            else {
+        return services.getMostPopularGames()
+            .then(mostPopularGames => {
                 rsp.status(200)
                    .json(JSON.parse(data))
-            }
-        }
+            })
+            .catch(error => {
+                rsp.status(err.statusCode)
+                   .json(err.message)
+            })
+
+        // services.getMostPopularGames(processResponse)
+        // function processResponse(err, data, res) {
+        //     if (err) {
+        //         rsp.status(err.statusCode)
+        //            .json(err.message)
+        //     }
+        //     else {
+        //         rsp.status(200)
+        //            .json(JSON.parse(data))
+        //     }
+        // }
     }
 
-    /** Get Game By Name
-     * Gets information about a specific game, which's name is passed
-     * on through the request parameters. The name has to be spelled exactly
-     * and it's case sensitive
-     * @param req
-     * @param rsp
-     */
-    function getGameByName(req, rsp) {
-        let name = '"'+req.params.name+'"'
 
-        services.getGameByName(name, processResponse)
+    function getGameByName(req, rsp) {
+        services.getGameByName(req.params.name, processResponse)
 
         function processResponse(err, data) {
             if (err) {
@@ -51,11 +46,6 @@ module.exports = function(services) {
         
     }
 
-    /** Get All Groups
-     * Displays information about all groups created
-     * @param req
-     * @param rsp
-     */
     function getAllGroups(req, rsp) {
         services.getAllGroups(processResponse);
 
@@ -117,6 +107,22 @@ module.exports = function(services) {
         }
     }
 
+    function removeGroup(req, rsp) {
+        services.removeGroup(req.params.id, processResponse)
+
+        function processResponse(err, data) {
+            if (err) {
+                rsp.status(err.statusCode)
+                    .json(err.message)
+            }
+            else {
+                console.log("Group Removed")
+                rsp.status(200)
+                    .json(data)
+            }
+        }
+    }
+
     function addGameToGroup(req, rsp) {
         services.addGameToGroup(req.params.id, req.body, processResponse)
 
@@ -169,6 +175,7 @@ module.exports = function(services) {
         getGroupInfo: getGroupInfo,
         getGamesFromGroupBasedOnRating: getGamesFromGroupBasedOnRating,
         createGroup: createGroup,
+        removeGroup: removeGroup,
         addGameToGroup: addGameToGroup,
         removeGameFromGroup: removeGameFromGroup,
         updateGroup: updateGroup

@@ -1,7 +1,9 @@
 'use strict'
 let groups = [];
 let last_idx = 0;
-module.exports =  function () {
+module.exports =  function (fetch, userException) {
+    if (!fetch) throw new userException('No fetch module found', 500)
+
     function getAllGroups(processResponse) {
         if (groups.length < 0)
             processResponse({
@@ -10,15 +12,20 @@ module.exports =  function () {
             })
         else {
             let groupList = []
-            groups.forEach(group => groupList.push({name: group.name, description: group.description, number_of_games: group.games.length}))
+            groups.forEach(group => groupList.push({id: group.id, name: group.name, description: group.description, number_of_games: group.games.length}))
             processResponse(null, groupList)
         }
     }
 
     function createGroup(details, processResponse) {
-        if (findGroup(null, details.name))
+        if (!details.name)
             processResponse({
-                message:'Group already in DB',
+                message:'No group name given',
+                statusCode: 400
+            })
+        else if (!details.description)
+            processResponse({
+                message:'No group description given',
                 statusCode: 400
             })
         else {
@@ -30,6 +37,20 @@ module.exports =  function () {
             }
             groups.push(group);
             processResponse(null, group);
+        }
+    }
+
+    function removeGroup(groupId, processResponse) {
+        let group = findGroup(groupId, null)
+        if (!group) {
+            processResponse({
+                message: "No group in database with such id",
+                statusCode: 404
+            })
+        }
+        else{
+            groups = groups.filter(grp => grp !== group)
+            getAllGroups(processResponse)
         }
     }
 
@@ -130,6 +151,7 @@ module.exports =  function () {
     return {
         getAllGroups: getAllGroups,
         createGroup: createGroup,
+        removeGroup: removeGroup,
         getGroupInfo: getGroupInfo,
         addGameToGroup: addGameToGroup,
         removeGameFromGroup: removeGameFromGroup,
@@ -153,7 +175,7 @@ module.exports =  function () {
     function loadMock() {
         groups = [
             {
-                id: 1,
+                id: 0,
                 name: "Best Games",
                 description: "A group of great games",
                 games : [
@@ -166,7 +188,7 @@ module.exports =  function () {
                 ]
             },
             {
-                id: 2,
+                id: 1,
                 name: "2nd Best Games",
                 description: "Another group of great games, not as good as he first ones",
                 games : [
