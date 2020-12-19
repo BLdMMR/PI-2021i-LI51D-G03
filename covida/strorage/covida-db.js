@@ -111,7 +111,6 @@ module.exports =  function (fetch, esUrl, userException) {
         }
     }
 
-
     //PROMISED
     function removeGameFromGroup(groupId, gameId) {
         let group = findGroup(groupId)
@@ -133,6 +132,7 @@ module.exports =  function (fetch, esUrl, userException) {
             return Promise.resolve(group.games)
         }
     }
+
     //PROMISED
     function updateGroup(groupId, details) {
         let group = findGroup(groupId)

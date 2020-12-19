@@ -7,8 +7,7 @@ const credentials = {
 
 }
 
-module.exports = function (fetch, urllib, userException) {
-    if (!urllib) throw "No urllib module found"
+module.exports = function (fetch, userException) {
     if (!fetch) throw 'No fetch module found'
 
     async function getMostPopularGames() {
@@ -28,17 +27,6 @@ module.exports = function (fetch, urllib, userException) {
         }
 
         return data;
-
-
-        /*urllib.request(base_api_url + '/games', {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Client-ID': credentials.client_id,
-                'Authorization': `Bearer${credentials.access_token}`
-            },
-            data: `fields name, total_rating, follows;where follows > 0; sort follows desc;`
-        }, processResponse)*/
     }
 
     async function searchGame(id) {
