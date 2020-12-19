@@ -1,24 +1,33 @@
 'use strict'
-const PORT = 8080 || process.argv[2]
+//Aplication running uses port 8080. When testing using mock data can specify port
+const PORT = process.argv[3] || 8080
+
+const ES_HOST = 'localhost'
+const ES_PORT = 9200
+const ELASTIC_SEARCH_BASE_URL = `http://${ES_HOST}:${ES_PORT}`
 
 const express = require('express')
 const fetch = require('node-fetch')
 const urllib = require('urllib')
-const userException = require('./userException.js')
-const igdb_data = require('./igdb-data.js')(urllib);
-const covida_db = require('./covida-db.js')(fetch, userException)
-const services = require('./covida-services.js')(igdb_data, covida_db)
-const web_api = require('./covida-web-api')(services)
 
-if (process.argv[3] === 'mock') covida_db.loadMock();
+const userException = require('./userException')
+const igdb_data = require('./strorage/igdb-data')(fetch, urllib, userException);
+const covida_db = require('./strorage/covida-db')(fetch, ELASTIC_SEARCH_BASE_URL,userException)
+const services = require('./covida-services')(igdb_data, covida_db, userException)
+const web_api = require('./covida-web-api')(services, userException)
+
+
+if (process.argv[2] === 'mock') covida_db.loadMock();
 
 const app = express()
 
 app.use(express.json())
 
+
+//ROUTER
 app.get('/api', apiDesc)
 app.get('/popular', web_api.getMostPopularGames)
-app.get('/search/:name', web_api.getGameByName)
+app.get('/search/:id', web_api.searchGame)
 app.get('/api/groups', web_api.getAllGroups)
 app.get('/api/groups/:id', web_api.getGroupInfo)
 app.get('/api/groups/:id/games', web_api.getGamesFromGroupBasedOnRating)
@@ -28,7 +37,7 @@ app.put('/api/groups/:id/games', web_api.addGameToGroup)
 app.put('/api/groups/:id/games/:gameid', web_api.removeGameFromGroup)
 app.put('/api/groups/:id', web_api.updateGroup)
 
-app.listen(PORT)
+app.listen(PORT, console.log(`App listening on port ${PORT}`))
 
 function apiDesc(req, rsp) {
     console.log(req.path)

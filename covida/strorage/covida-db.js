@@ -1,33 +1,46 @@
 'use strict'
 let groups = [];
 let last_idx = 0;
-module.exports =  function (fetch, userException) {
-    if (!fetch) throw new userException('No fetch module found', 500)
+module.exports =  function (fetch, esUrl, userException) {
+    if (!fetch) throw 'No fetch module found'
 
-    function getAllGroups(processResponse) {
-        if (groups.length < 0)
-            processResponse({
+    //PROMISED
+    async function getAllGroups() {
+        if (groups.length <= 0)
+            return Promise.reject({
                 message: "There are no groups in database",
                 statusCode: 404
             })
         else {
             let groupList = []
             groups.forEach(group => groupList.push({id: group.id, name: group.name, description: group.description, number_of_games: group.games.length}))
-            processResponse(null, groupList)
+            return Promise.resolve(groupList)
         }
     }
 
-    function createGroup(details, processResponse) {
-        if (!details.name)
-            processResponse({
-                message:'No group name given',
-                statusCode: 400
+    //PROMISED
+    async function getGroupInfo(groupId) {
+        const group = findGroup(groupId)
+        if (!group) {
+            return Promise.reject({
+                message: `No group in database with the id ${groupId}`,
+                statusCode: 404
             })
+        } else {
+            return Promise.resolve(group)
+        }
+    }
+
+    function hasReadableCharacters(groupName) {
+        return groupName.trim().length !== 0
+    }
+
+    //PROMISED
+    function createGroup(details) {
+        if (!details.name || !hasReadableCharacters(details.name))
+            return Promise.reject(userException('No group name given or empty', 400))
         else if (!details.description)
-            processResponse({
-                message:'No group description given',
-                statusCode: 400
-            })
+            return Promise.reject(userException('No group description given', 400))
         else {
             let group = {
                 id: last_idx++,
@@ -36,39 +49,26 @@ module.exports =  function (fetch, userException) {
                 games: []
             }
             groups.push(group);
-            processResponse(null, group);
+            return Promise.resolve(group)
         }
     }
 
-    function removeGroup(groupId, processResponse) {
-        let group = findGroup(groupId, null)
-        if (!group) {
-            processResponse({
-                message: "No group in database with such id",
-                statusCode: 404
-            })
+    //PROMISED
+    function removeGroup(groupId) {
+        let groupToRemove = findGroup(groupId)
+        if (!groupToRemove) {
+            return Promise.reject(new userException("No group in database with such id", 404))
         }
         else{
-            groups = groups.filter(grp => grp !== group)
-            getAllGroups(processResponse)
+            groups = groups.filter(grp => grp !== groupToRemove)
+            return getAllGroups()
         }
     }
 
-    function getGroupInfo(groupId, processResponse) {
-        const group = findGroup(groupId)
-        if (!group) {
-            processResponse({
-                message: `No group in database with the name ${groupId}`,
-                statusCode: 404
-            })
-        } else {
-            processResponse(null, group)
-        }
-    }
-
-    function getGamesFromGroupBasedOnRating(groupId, min, max, processResponse) {
+    //PROMISED
+    function getGamesFromGroupBasedOnRating(groupId, min, max) {
         if (min > max) {
-            processResponse({
+            return Promise.reject({
                     message: "Minimum value bigger than maximum",
                     statusCode: 400
                 }
@@ -76,63 +76,68 @@ module.exports =  function (fetch, userException) {
         }
         let group = findGroup(groupId);
         if(!group)
-            processResponse({
+            return Promise.reject({
                 message: `No group in database with name ${groupId}`,
                 statusCode: 404
             })
         else {
-            let retGames = group.games.filter(game => game.total_rating > min && game.total_rating < max);
-            if (retGames.length > 0) processResponse(null, retGames)
-            else processResponse({
+            let retGames = group.games.filter(game => game.total_rating >= min && game.total_rating <= max);
+            if (retGames.length > 0) return Promise.resolve(retGames)
+            else return Promise.reject({
                 message: `No games in group with ratings withing the values ${min} and ${max}`,
                 statusCode: 404
             })
         }
     }
 
-    function addGameToGroup(groupId, game, processResponse) {
+    //PROMISED
+    function addGameToGroup(groupId, game) {
         let group = findGroup(groupId);
         if (!group) {
-            processResponse({
-                message:`No group in database with the name ${groupId}`,
+            return Promise.reject({
+                message:`No group in database with the id ${groupId}`,
                 statusCode: 404
             })
         } else {
             if (group.games.find(groupElement => game.name.toUpperCase() === groupElement.name.toUpperCase()))
-                processResponse({
+                return Promise.reject({
                     message:`The group already has a game with the name ${game.name}`,
                     statusCode: 400
                 })
             else {
                 group.games.push(game)
-                processResponse(null, group)
+                return Promise.resolve(group)
             }
         }
     }
 
-    function removeGameFromGroup(groupId, gameId, processResponse) {
+
+    //PROMISED
+    function removeGameFromGroup(groupId, gameId) {
         let group = findGroup(groupId)
+        console.log(typeof gameId)
+        group.games.forEach(game => console.log(game.name + ': ' +game.id + ' -> ' + typeof game.id))
         if (!group) {
-            processResponse({
-                message:`No group in database with the name ${groupId}`,
+            return Promise.reject({
+                message:`No group in database with the id ${groupId}`,
                 statusCode: 404
             })
         }
-        else if (!group.games.find(groupElement => gameId === groupElement.name))
-            processResponse({
-                message:`The group doesn't have a game with the name ${gameId}`,
+        else if (!group.games.find(groupElement => gameId === groupElement.id))
+            return Promise.reject({
+                message:`The group doesn't have a game with the id ${gameId}`,
                 statusCode:404
             })
         else {
-            group.games = group.games.filter(game => game.name !== gameId);
-            processResponse(null, group.games)
+            group.games = group.games.filter(game => game.id !== gameId);
+            return Promise.resolve(group.games)
         }
     }
-
-    function updateGroup(groupId, details, processResponse) {
+    //PROMISED
+    function updateGroup(groupId, details) {
         let group = findGroup(groupId)
         if (!group) {
-            processResponse({
+            return Promise.reject({
                 message: `No group in database with the name ${groupId}`,
                 statusCode: 404
 
@@ -141,12 +146,9 @@ module.exports =  function (fetch, userException) {
         else {
             if(details.name) group.name = details.name
             if(details.description) group.description = details.description
-            processResponse(null, group)
+            return Promise.resolve(group)
         }
     }
-
-
-
 
     return {
         getAllGroups: getAllGroups,
@@ -161,7 +163,7 @@ module.exports =  function (fetch, userException) {
     }
 
     /**
-     * Auxiliary function that fetches the group from the groups array either by name or by id
+     * Auxiliary function that fetches the group from the groups array either by id or by name
      * @param name
      * @param id
      * @returns {*}

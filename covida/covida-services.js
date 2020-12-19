@@ -2,138 +2,137 @@
 
 const MAXIMUM_RESULTS = 10000
 
-module.exports = function(igdb_data, covida_db) {
-    if (!igdb_data) throw "No web-api module found";
-    if (!covida_db) throw "No covida_db module found";
+module.exports = function(igdb_data, covida_db, userException) {
+    if (!igdb_data) throw "No web-api module found"
+    if (!covida_db) throw "No covida_db module found"
 
     function getMostPopularGames() {
         let num_of_results = 15
 
-        return igdb_data.getMostPopularGames(num_of_results);
+        return igdb_data.getMostPopularGames();
     }
 
-    function getGameByName(name, processResponse) {
-        if (!name)
-            processResponse({
-                message:"No Name given",
+    function searchGame(id) {
+        if (!id)
+            return Promise.reject({
+                message:"No id given",
                 statusCode: 400
             })
         else{
-            let formatedName = '"'+
-                name.
-                split("_").
-                reduce((stringToFrom, currentWord) => stringToFrom + ' ' + currentWord) +
-                '"'
-            igdb_data.getGameByName(formatedName, processResponse);
+            return igdb_data.searchGame(id);
         }
 
     }
 
-    function getAllGroups(processResponse) {
-        covida_db.getAllGroups(processResponse)
+    function getAllGroups() {
+        return covida_db.getAllGroups()
     }
 
-    function getGroupInfo(id, processResponse) {
+    function getGroupInfo(id) {
         if (!id)
-            processResponse({
+            return Promise.reject({
+                message: `No group in database with the name ${groupId}`,
+                statusCode: 404
+            })
+        else
+            return covida_db.getGroupInfo(id);
+    }
+
+    function getGamesFromGroupBasedOnRating(id, details) {
+        console.log(details)
+        const max = parseInt(details.max)
+        const min = parseInt(details.min)
+        console.log(`Searching games in group ${id} with ratings between ${min} and ${max}`)
+        if (!id)
+            return Promise.reject({
                 message:"No group id given",
                 statusCode: 400
             })
-        else
-            covida_db.getGroupInfo(id, processResponse);
-    }
-
-    function getGamesFromGroupBasedOnRating(id, details, processResponse) {
-        if (!id)
-            processResponse({
-                message:"No group id given",
+        else if (isNaN(max) || max > 100)
+            return Promise.reject({
+                message: "Invalid max value given",
                 statusCode: 400
             })
-        else if (!parseInt(details.max))
-            processResponse({
-                message: "No max value given",
-                statusCode: 400
-            })
-        else if (!parseInt(details.min))
-            processResponse({
-                message: "No min value given",
+        else if (isNaN(min) || min < 0)
+            return Promise.reject({
+                message: "Invalid min value given",
                 statusCode: 400
             })
         else
-            covida_db.getGamesFromGroupBasedOnRating(id, parseInt(details.min), parseInt(details.max), processResponse)
+            return covida_db.getGamesFromGroupBasedOnRating(id, min, max)
     }
 
-    function createGroup(group, processResponse) {
+    function createGroup(group) {
         if (!group)
-            processResponse({
+            return Promise.reject({
                 message: "No group details given",
                 statusCode: 400
             })
         else
-            covida_db.createGroup(group, processResponse)
+            return covida_db.createGroup(group)
     }
 
-    function removeGroup(groupId, processResponse) {
-        if (!groupId) processResponse({
-            message:"No group id given",
-            statusCode: 400
-        })
+    function removeGroup(groupId) {
+        if (!groupId) {
+            Promise.reject({
+                message: "No group id given",
+                statusCode: 400
+            })
+        }
         else
-            covida_db.removeGroup(groupId, processResponse)
+            return covida_db.removeGroup(groupId, processResponse)
     }
 
-    function addGameToGroup(groupName, game, processResponse) {
-        if (!groupName)
-            processResponse({
+    function addGameToGroup(groupId, game) {
+        if (!groupId)
+            return Promise.reject({
                 message: "No group id given",
                 statusCode: 400
             })
         else if (!game)
-            processResponse({
+            return Promise.reject({
                 message: "No game details given",
                 statusCode: 400
             })
         else
-            covida_db.addGameToGroup(groupName, game, processResponse)
+            return covida_db.addGameToGroup(groupId, game)
     }
 
-    function removeGameFromGroup(groupName, gameId, processResponse) {
-        if (!groupName)
-            processResponse({
+    function removeGameFromGroup(groupId, gameId, processResponse) {
+        let id = parseInt(gameId)
+        if (!groupId)
+            return Promise.reject({
                 message: "No group id given",
                 statusCode: 400
             })
-        else if (!gameId)
-            processResponse({
-                message: "No game id given",
+        else if (!gameId || isNaN(id))
+            return Promise.reject({
+                message: "invalid game id given",
                 statusCode: 400
             })
         else{
-            let formatedName = gameId.
-                split("_").
-                reduce((stringToFrom, currentWord) => stringToFrom + ' ' + currentWord)
-            covida_db.removeGameFromGroup(groupName, formatedName, processResponse)
+            return covida_db.removeGameFromGroup(groupId, id, processResponse)
         }
     }
 
-    function updateGroup(groupName, details, processResponse) {
+    function updateGroup(groupName, details) {
         if (!groupName)
-            processResponse({
+            return Promise.reject({
                 message: "No group id given",
                 statusCode: 400
             })
         else if (!details)
-            processResponse({
+            return Promise.reject({
                 message: "No group details given",
                 statusCode: 400
             })
         else
-            covida_db.updateGroup(groupName, details, processResponse)
+            return covida_db.updateGroup(groupName, details)
     }
 
     return {
         getMostPopularGames: getMostPopularGames,
-        getGameByName: getGameByName,
+        searchGame: searchGame,
         getAllGroups: getAllGroups,
         getGroupInfo: getGroupInfo,
         getGamesFromGroupBasedOnRating: getGamesFromGroupBasedOnRating,

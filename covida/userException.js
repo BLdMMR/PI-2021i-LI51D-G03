@@ -1,8 +1,8 @@
 'use strict'
 
-module.exports = function(message, statusCode) {
+module.exports = function userException(message, statusCode) {
     return {
-        message: message,
-        statusCode: statusCode
+        errorMessage: message,
+        errorStatusCode: statusCode
     }
 }
