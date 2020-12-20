@@ -17,7 +17,10 @@ const services = require('./covida-services')(igdb_data, covida_db, userExceptio
 const web_api = require('./covida-web-api')(services, userException)
 
 
-if (process.argv[2] === 'mock') covida_db.loadMock();
+if (process.argv[2] === 'mock')
+    covida_db.loadMock()
+        .then(()=>console.log('Mock Data Loaded'))
+        .catch(error => console.log(error));
 
 const app = express()
 

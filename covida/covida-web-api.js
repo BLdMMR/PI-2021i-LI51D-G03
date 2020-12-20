@@ -123,7 +123,7 @@ module.exports = function(services, userException) {
     function removeGameFromGroup(req, rsp) {
         services.removeGameFromGroup(req.params.id, req.params.gameid)
             .then(data => {
-                console.log('Game Removed to group')
+                console.log('Game Removed from group')
                 rsp.status(200)
                     .json(data)
             })
@@ -144,16 +144,6 @@ module.exports = function(services, userException) {
                 rsp.status(err.statusCode)
                     .json(err.message)
             })
-        function processResponse(err, data) {
-            if (err) {
-                rsp.status(err.statusCode)
-                   .json(err.message)
-            } else {
-                console.log('Group Updated')
-                rsp.status(200)
-                   .json(data)
-            }
-        }
     }
 
     return {

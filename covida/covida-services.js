@@ -7,8 +7,6 @@ module.exports = function(igdb_data, covida_db, userException) {
     if (!covida_db) throw "No covida_db module found"
 
     function getMostPopularGames() {
-        let num_of_results = 15
-
         return igdb_data.getMostPopularGames();
     }
 
@@ -31,18 +29,17 @@ module.exports = function(igdb_data, covida_db, userException) {
     function getGroupInfo(id) {
         if (!id)
             return Promise.reject({
-                message: `No group in database with the name ${groupId}`,
-                statusCode: 404
+                message: `No id given`,
+                statusCode: 400
             })
         else
             return covida_db.getGroupInfo(id);
     }
 
     function getGamesFromGroupBasedOnRating(id, details) {
-        console.log(details)
         const max = parseInt(details.max)
         const min = parseInt(details.min)
-        console.log(`Searching games in group ${id} with ratings between ${min} and ${max}`)
+
         if (!id)
             return Promise.reject({
                 message:"No group id given",
@@ -80,7 +77,7 @@ module.exports = function(igdb_data, covida_db, userException) {
             })
         }
         else
-            return covida_db.removeGroup(groupId, processResponse)
+            return covida_db.removeGroup(groupId)
     }
 
     function addGameToGroup(groupId, game) {
@@ -94,11 +91,13 @@ module.exports = function(igdb_data, covida_db, userException) {
                 message: "No game details given",
                 statusCode: 400
             })
-        else
+        else{
             return covida_db.addGameToGroup(groupId, game)
+        }
+
     }
 
-    function removeGameFromGroup(groupId, gameId, processResponse) {
+    function removeGameFromGroup(groupId, gameId) {
         let id = parseInt(gameId)
         if (!groupId)
             return Promise.reject({
@@ -111,7 +110,7 @@ module.exports = function(igdb_data, covida_db, userException) {
                 statusCode: 400
             })
         else{
-            return covida_db.removeGameFromGroup(groupId, id, processResponse)
+            return covida_db.removeGameFromGroup(groupId, id)
         }
     }
 

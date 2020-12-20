@@ -4,30 +4,38 @@ let last_idx = 0;
 module.exports =  function (fetch, esUrl, userException) {
     if (!fetch) throw 'No fetch module found'
 
-    //PROMISED
+    //PROMISED & WITH ES
     async function getAllGroups() {
-        if (groups.length <= 0)
+        const response = await fetch(`${esUrl}/groups/_search`)
+        const result = await response.json()
+        if (result.hits.hits.length <= 0)
             return Promise.reject({
                 message: "There are no groups in database",
                 statusCode: 404
             })
         else {
             let groupList = []
-            groups.forEach(group => groupList.push({id: group.id, name: group.name, description: group.description, number_of_games: group.games.length}))
+            result.hits.hits.forEach(group => groupList.push({
+                id: group._source.id,
+                name: group._source.name,
+                description: group._source.description,
+                number_of_games: group._source.games.length
+            }))
+
             return Promise.resolve(groupList)
         }
     }
 
-    //PROMISED
+    //PROMISED & WITH ES
     async function getGroupInfo(groupId) {
-        const group = findGroup(groupId)
+        const group = await findGroup(groupId)
         if (!group) {
             return Promise.reject({
                 message: `No group in database with the id ${groupId}`,
                 statusCode: 404
             })
         } else {
-            return Promise.resolve(group)
+            return group._source
         }
     }
 
@@ -35,38 +43,72 @@ module.exports =  function (fetch, esUrl, userException) {
         return groupName.trim().length !== 0
     }
 
-    //PROMISED
-    function createGroup(details) {
+    //PROMISED & WITH ES
+    async function createGroup(details) {
         if (!details.name || !hasReadableCharacters(details.name))
-            return Promise.reject(userException('No group name given or empty', 400))
+
+            return Promise.reject(
+                {message: 'No group name given or unable to be read', statusCode: 400}
+            )
+
         else if (!details.description)
-            return Promise.reject(userException('No group description given', 400))
+
+            return Promise.reject(
+                {message: 'No group description given or unable to be read', statusCode: 400}
+            )
+
         else {
+
+            const res = await fetch(`${esUrl}/groups/_search`)
+            const idx_res = await res.json()
+            last_idx = 0
+
+            while (idx_res.hits.hits.some(group => group._source.id === last_idx)) {
+                last_idx++;
+            }
+
             let group = {
-                id: last_idx++,
+                id: last_idx,
                 name: details.name,
                 description: details.description,
                 games: []
             }
-            groups.push(group);
+
+            const response = await fetch(`${esUrl}/groups/_doc`, {
+                method:'POST',
+                headers:{'Content-Type': 'application/json'},
+                body: JSON.stringify(group)
+            })
+
+            const result = await response.json()
+            if (!result) return Promise.reject({message: 'Unable to create group',statusCode: 500})
             return Promise.resolve(group)
         }
     }
 
-    //PROMISED
-    function removeGroup(groupId) {
-        let groupToRemove = findGroup(groupId)
+    //PROMISED & WITH ES
+    //TODO -> change so it displays the result updated. It's showing all groups with the removed group still in it
+    async function removeGroup(groupId) {
+        let groupToRemove = await findGroup(groupId)
         if (!groupToRemove) {
-            return Promise.reject(new userException("No group in database with such id", 404))
+            return Promise.reject({message: "No group in database with such id", statusCode: 404})
         }
         else{
-            groups = groups.filter(grp => grp !== groupToRemove)
-            return getAllGroups()
+            const response = await fetch(`${esUrl}/groups/_doc/${groupToRemove._id}`,{
+                method: 'DELETE',
+                headers: {'Content-Type': 'application/json'},
+                body: {}
+            })
+            const result = await response.json()
+            if (!result) {
+                return Promise.reject({message: 'Unable to remove group',statusCode: 500})
+            }
+            return await getAllGroups()
         }
     }
 
-    //PROMISED
-    function getGamesFromGroupBasedOnRating(groupId, min, max) {
+    //PROMISED & WITH ES
+    async function getGamesFromGroupBasedOnRating(groupId, min, max) {
         if (min > max) {
             return Promise.reject({
                     message: "Minimum value bigger than maximum",
@@ -74,14 +116,14 @@ module.exports =  function (fetch, esUrl, userException) {
                 }
             )
         }
-        let group = findGroup(groupId);
-        if(!group)
+        let group = await findGroup(groupId);
+        if (!group)
             return Promise.reject({
                 message: `No group in database with name ${groupId}`,
                 statusCode: 404
             })
         else {
-            let retGames = group.games.filter(game => game.total_rating >= min && game.total_rating <= max);
+            let retGames = group._source.games.filter(game => game.total_rating >= min && game.total_rating <= max);
             if (retGames.length > 0) return Promise.resolve(retGames)
             else return Promise.reject({
                 message: `No games in group with ratings withing the values ${min} and ${max}`,
@@ -90,63 +132,78 @@ module.exports =  function (fetch, esUrl, userException) {
         }
     }
 
-    //PROMISED
-    function addGameToGroup(groupId, game) {
-        let group = findGroup(groupId);
+    //PROMISED & WITH ES
+    async function addGameToGroup(groupId, game) {
+        let group = await findGroup(groupId);
         if (!group) {
             return Promise.reject({
                 message:`No group in database with the id ${groupId}`,
                 statusCode: 404
             })
         } else {
-            if (group.games.find(groupElement => game.name.toUpperCase() === groupElement.name.toUpperCase()))
+            if (group._source.games.some(groupElement => game.name.toUpperCase() === groupElement.name.toUpperCase()))
                 return Promise.reject({
-                    message:`The group already has a game with the name ${game.name}`,
+                    message:`The group already has a game with the id ${game.id}`,
                     statusCode: 400
                 })
             else {
-                group.games.push(game)
-                return Promise.resolve(group)
+                await fetch(`${esUrl}/groups/_doc/${group._id}`, {
+                    method: 'PUT',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(group._source)
+                })
+                //const result = await response.json()
+                //if (!result) return Promise.reject('Unable to add the game to the group', 500)
+
+                return group._source
             }
         }
     }
 
-    //PROMISED
-    function removeGameFromGroup(groupId, gameId) {
-        let group = findGroup(groupId)
-        console.log(typeof gameId)
-        group.games.forEach(game => console.log(game.name + ': ' +game.id + ' -> ' + typeof game.id))
+    //PROMISED & WITH ES
+    async function removeGameFromGroup(groupId, gameId) {
+        let group = await findGroup(groupId)
         if (!group) {
             return Promise.reject({
                 message:`No group in database with the id ${groupId}`,
                 statusCode: 404
             })
         }
-        else if (!group.games.find(groupElement => gameId === groupElement.id))
+        else if (!group._source.games.some(groupGame => gameId === groupGame.id))
             return Promise.reject({
                 message:`The group doesn't have a game with the id ${gameId}`,
                 statusCode:404
             })
         else {
-            group.games = group.games.filter(game => game.id !== gameId);
-            return Promise.resolve(group.games)
+            group._source.games = group._source.games.filter(game => game.id !== gameId);
+            await fetch(`${esUrl}/groups/_doc/${group._id}`,{
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(group._source)
+            })
+            return Promise.resolve(group._source)
         }
     }
 
-    //PROMISED
-    function updateGroup(groupId, details) {
-        let group = findGroup(groupId)
+    //PROMISED & WITH ES
+    async function updateGroup(groupId, details) {
+        let group = await findGroup(groupId)
         if (!group) {
             return Promise.reject({
                 message: `No group in database with the name ${groupId}`,
                 statusCode: 404
 
             })
-        }
-        else {
-            if(details.name) group.name = details.name
-            if(details.description) group.description = details.description
-            return Promise.resolve(group)
+        } else {
+            if (details.name && hasReadableCharacters(details.name)) group._source.name = details.name
+            if (details.description) group._source.description = details.description
+
+            await fetch(`${esUrl}/groups/_doc/${group._id}`,{
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(group._source)
+            })
+            return Promise.resolve(group._source)
         }
     }
 
@@ -168,42 +225,33 @@ module.exports =  function (fetch, esUrl, userException) {
      * @param id
      * @returns {*}
      */
-    function findGroup(id, name) {
-        if (name != null) return  groups.find(grp => grp.name.toUpperCase() === name.toUpperCase());
-        if (id != null) return  groups.find(grp => grp.id == id);
-        throw "No group specified through name or id"
+    async function findGroup(id, name) {
+        if (id != null) {
+            const response = await fetch(`${esUrl}/groups/_search`)
+            const result = await response.json()
+            return result.hits.hits.filter(element => element._source.id === parseInt(id))[0]
+        }
     }
 
-    function loadMock() {
-        groups = [
-            {
-                id: 0,
-                name: "Best Games",
-                description: "A group of great games",
-                games : [
-                    {id: 1020, name: "Grand Theft Auto V", follows: 1699, total_rating: 93.436101},
-                    {id: 1942, name: "The Witcher 3: Wild Hunt", follows: 1467, total_rating: 93.672166},
-                    {id: 472, name: "The Elder Scrolls V: Skyrim", follows: 1025, total_rating: 91.911974},
-                    {id: 732, name: "Grand Theft Auto: San Andreas", follows: 955, total_rating: 91.757998},
-                    {id: 72, name: "Portal 2", follows: 949, total_rating: 91.885120},
 
-                ]
-            },
-            {
-                id: 1,
-                name: "2nd Best Games",
-                description: "Another group of great games, not as good as he first ones",
-                games : [
-                    {id: 71, name: "Portal", follows: 886, total_rating: 83.538920},
-                    {id: 233, name: "Half-Life 2", follows: 885, total_rating: 90.960823},
-                    {id: 1877, name: "Cyberpunk 2077", follows: 856, total_rating: 0},
-                    {id: 1009, name: "The Last of Us", follows: 835, total_rating: 93.017695},
-                    {id: 74, name: "Mass Effect 2", follows: 785, total_rating: 93.690090},
+    //NOT WORKING PROPERLY, NO TIME TO FIX...
+    async function loadMock() {
 
-                ]
-            }
-        ]
-        last_idx = 2
+        /*
+        await createGroup({ name: "Best Games", description: "A group of great games"})
+        await addGameToGroup(0, {id: 1020, name: "Grand Theft Auto V", follows: 1699, total_rating: 93.436101})
+        await addGameToGroup(0, {id: 1942, name: "The Witcher 3: Wild Hunt", follows: 1467, total_rating: 93.672166})
+        await addGameToGroup(0, {id: 472, name: "The Elder Scrolls V: Skyrim", follows: 1025, total_rating: 91.911974})
+        await addGameToGroup(0, {id: 732, name: "Grand Theft Auto: San Andreas", follows: 955, total_rating: 91.757998})
+        await addGameToGroup(0, {id: 72, name: "Portal 2", follows: 949, total_rating: 91.885120})
+
+        await createGroup({ name: "2nd Best Games", description: "Another group of great games, not as good as he first ones"})
+        await addGameToGroup(1,{id: 71, name: "Portal", follows: 886, total_rating: 83.538920} )
+        await addGameToGroup(1, {id: 233, name: "Half-Life 2", follows: 885, total_rating: 90.960823})
+        await addGameToGroup(1, {id: 1877, name: "Cyberpunk 2077", follows: 856, total_rating: 0})
+        await addGameToGroup(1, {id: 1009, name: "The Last of Us", follows: 835, total_rating: 93.017695})
+        await addGameToGroup(1, {id: 74, name: "Mass Effect 2", follows: 785, total_rating: 93.690090})
+         */
     }
 
 }

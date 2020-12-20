@@ -30,16 +30,6 @@ module.exports = function (fetch, userException) {
     }
 
     async function searchGame(id) {
-        console.log(id)
-        console.log(base_api_url+'/games', {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Client-ID': credentials.client_id,
-                'Authorization': `Bearer ${credentials.access_token}`
-            },
-            data:`fields name, genres, total_rating, follows; where id = ${id};`
-        })
         const response = await fetch(base_api_url+'/games', {
             method: 'POST',
             headers: {
@@ -51,7 +41,6 @@ module.exports = function (fetch, userException) {
         })
 
         const data = await response.json();
-        console.log(data)
         if (!data) {
             throw new userException("Unable to find game", 502)
         }

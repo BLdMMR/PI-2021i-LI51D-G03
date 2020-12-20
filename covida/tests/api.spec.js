@@ -28,13 +28,13 @@ describe('most popular games', function () {
 
 describe('game by name', function () {
     test('should get the info about a specific game', function () {
-        return frisby.get(`${base}search/Trackmania`)
+        return frisby.get(`${base}search/1020`)
             .expect('status', 200)
             .expect('jsonTypes', '*', {
-                id: Joi.number().required(),
+                id: 1020,
                 follows: Joi.number().required(),
                 genres: Joi.array().required(),
-                name: Joi.string().required(),
+                name: "Grand Theft Auto V",
                 total_rating: Joi.number()
             })
     })
@@ -54,11 +54,11 @@ describe('all groups', function () {
 
 describe('specific group', function () {
     test('should get info of a specific group', function () {
-        return frisby.get(`${base}api/groups/Best Games/`)
+        return frisby.get(`${base}api/groups/0/`)
             .expect('status', 200)
             .expect('jsonTypes', {
                 id: Joi.number().required(),
-                name: 'Best Games',
+                name: Joi.string().required(),
                 description: Joi.string(),
                 games: Joi.array().required()
             })
@@ -67,7 +67,7 @@ describe('specific group', function () {
 
 describe('group that does not exist', function () {
     test('Should return 404: No Group in database', function () {
-        return frisby.get(`${base}api/groups/Funny Games/`)
+        return frisby.get(`${base}api/groups/23/`)
             .expect('status', 404)
             .expect('jsonTypes', Joi.string().required())
     })
@@ -75,7 +75,7 @@ describe('group that does not exist', function () {
 
 describe('games from group based on rating', function () {
     test('Should return a list of games with total_rating within min and max', function () {
-        return frisby.get(`${base}api/groups/2nd Best Games/games?min=70&max=90`)
+        return frisby.get(`${base}api/groups/1/games?min=90&max=93`)
             .expect('status', 200)
             .expect('jsonTypes', '*', {
                 id: Joi.number().required(),
@@ -88,7 +88,7 @@ describe('games from group based on rating', function () {
 
 describe('games from group based on rating with values reversed', function () {
     test('Should return a message about min and max', function () {
-        return frisby.get(`${base}api/groups/2nd Best Games/games?min=90&max=70`)
+        return frisby.get(`${base}api/groups/0/games?min=90&max=70`)
             .expect('status', 400)
             .expect('jsonTypes', Joi.string().required())
     })
@@ -117,14 +117,19 @@ describe('create group that exists', function () {
             name: "Best Games",
             description: "A group of first person shooters"
         })
-            .expect('status', 400)
-            .expect('jsonTypes',Joi.string().required())
+            .expect('status', 201)
+            .expect('jsonTypes',{
+                id: Joi.number().required(),
+                name: Joi.string().required(),
+                description: Joi.string(),
+                games: Joi.array().required()
+            } )
     })
 })
 
 describe('add game to a group', function () {
     test('Should return the list of games of the group', function () {
-        return frisby.put(`${base}api/groups/Best Games/games`, {
+        return frisby.put(`${base}api/groups/1/games`, {
             id: 71,
             follows: 886,
             name: "Portal",
@@ -142,7 +147,7 @@ describe('add game to a group', function () {
 
 describe('add an existing game to a group', function () {
     test('Should return a message of error', function () {
-        return frisby.put(`${base}api/groups/Best Games/games`, {
+        return frisby.put(`${base}api/groups/1/games`, {
             id: 71,
             follows: 886,
             name: "Portal",
@@ -155,15 +160,15 @@ describe('add an existing game to a group', function () {
 
 describe('remove game from a group', function () {
     test('Should return the list of games of the group', function () {
-        return frisby.delete(`${base}api/groups/Best Games/games/Portal`)
+        return frisby.put(`${base}api/groups/1/games/71`)
             .expect('status', 200)
-            .expect('jsonTypes', Joi.array().required())
+            .expect('jsonTypes', Joi.object().required())
     })
 })
 
 describe('remove an non-existing game from a group', function () {
     test('Should return the list of games of the group', function () {
-        return frisby.delete(`${base}api/groups/Best Games/games/Portal`)
+        return frisby.put(`${base}api/groups/1/games/71`)
             .expect('status', 404)
             .expect('jsonTypes', Joi.string().required())
     })
@@ -171,7 +176,7 @@ describe('remove an non-existing game from a group', function () {
 
 describe('update a group', function () {
     test('Should return the group', function () {
-        return frisby.put(`${base}api/groups/Best Games`, {
+        return frisby.put(`${base}api/groups/1`, {
             name: "Portals",
             description: "The list of the Portal games and other great ones"
         })
@@ -187,7 +192,7 @@ describe('update a group', function () {
 
 describe('update a group that does not exist', function () {
     test('Should return the group', function () {
-        return frisby.put(`${base}api/groups/Best Games`, {
+        return frisby.put(`${base}api/groups/25`, {
             name: "Portals",
             description: "The list of the Portal games and other great ones"
         })
