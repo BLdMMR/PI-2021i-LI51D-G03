@@ -1,0 +1,24 @@
+<div id="gameContainer">
+      <img src="https://pbs.twimg.com/media/Eq9As1sXcAAHmsi.png" alt="">
+      <h1>{{name}}</h1>
+      <h5>{{id}}</h5>
+      <h4>{{genres}}</h4>
+      <h4>{{follows}}</h4>
+      <h4>{{total_rating}}</h4>
+</div>
+<div class="row">
+      <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+            Add To Group
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            {{#each groups}}
+                  <li><a class="dropdown-item" href="#"> {{name}} </a></li>
+            {{/each}}
+            <form action="/site/groups" method="put">
+                  
+            </form>
+            
+            </ul>
+      </div>
+</div>

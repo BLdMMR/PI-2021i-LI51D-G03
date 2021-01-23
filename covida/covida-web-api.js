@@ -2,7 +2,7 @@
 
 /** This is the only module that understands HTTP **/
 
-module.exports = function(services, userException) {
+module.exports = function(services, userException, router) {
     if (!services) throw "No services module found"
 
     function getMostPopularGames(req, rsp) {
@@ -108,16 +108,6 @@ module.exports = function(services, userException) {
                 rsp.status(err.statusCode)
                     .json(err.message)
             })
-        function processResponse(err, data) {
-            if (err) {
-                rsp.status(err.statusCode)
-                   .json(err.message)
-            } else {
-                console.log('Game Added to group')
-                rsp.status(201)
-                   .json(data)
-            }
-        }
     }
 
     function removeGameFromGroup(req, rsp) {
@@ -145,6 +135,19 @@ module.exports = function(services, userException) {
                     .json(err.message)
             })
     }
+
+    router.get('/popular', getMostPopularGames)
+    router.get('/search/:id', searchGame)
+    router.get('/api/groups', getAllGroups)
+    router.get('/api/groups/:id', getGroupInfo)
+    router.get('/api/groups/:id/games', getGamesFromGroupBasedOnRating)
+    router.post('/api/groups', createGroup)
+    router.delete('/api/groups/:id', removeGroup)
+    router.put('/api/groups/:id/games', addGameToGroup)
+    router.put('/api/groups/:id/games/:gameid', removeGameFromGroup)
+    router.put('/api/groups/:id', updateGroup)
+
+    return router
 
     return {
         getMostPopularGames: getMostPopularGames,

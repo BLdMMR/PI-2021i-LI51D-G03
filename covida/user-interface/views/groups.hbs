@@ -1,0 +1,59 @@
+<div>
+    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+      <div class="carousel-inner">
+            {{#each games}}
+            <div class="carousel-item active">
+            <img src="{{game_img1}}" class="rounded" alt="{{name}}" id="img" >
+            <a href="/search?id={{id}}" class="image-link">{{name}}</a>
+            </div>
+            {{/each}}
+      </div>
+        <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </a>
+        <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </a>
+    </div>
+</div>
+
+<div class="container">
+      <div class="row">
+            Username: {{username}}
+            <a href="/users/logout">Logout</a>
+      </div>
+      <div class="row">
+      {{#each groups}}
+            <div class="col-sm-3">
+                  <div class="card-body">
+                        <h3 class="card-title"> {{name}}</h5>
+                        <p class="card-text">{{description}}</p>
+                        <a href="#" class="card-link"><a href="groups/{{id}}">Details</a>
+                  </div>
+            </div>
+      {{/each}}
+      </div>
+
+      <h1>Create Group</h1>
+
+      <div class="container">
+            <div class="row">
+                  <form method="POST" action="/site/groups">
+                        <div>
+                              <label for="name" class="form-label">Group Name</label>
+                              <input type="text" class="form-control" name="name" id="name">
+                        </div>
+                        <div>
+                              <label for="description" class="form-label">Description</label>
+                              <input type="text" class="form-control" name="description" id="desc">
+                        </div>
+                        <div>
+                              <button type="submit" class="btn btn-primary btn-block"> Submit </button>
+                        </div>
+                  </form>
+            </div>
+
+      </div>
+</div>

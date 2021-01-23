@@ -1,6 +1,6 @@
 const base_api_url = "https://api.igdb.com/v4"
 const credentials = {
-    access_token: "4fa2e2xd03b9slsfjacex2yfo9xmbe",
+    access_token: "mbp82xakas6q4957cxiir5sl3ynml3",
     expires_in: 5462024,
     token_type: "bearer",
     client_id : "kul61h0ut19avpfl07q590hsgl3b3y"
@@ -26,6 +26,22 @@ module.exports = function (fetch, userException) {
             throw new userException("No popular games found", 502)
         }
 
+        for(i = 0; i < data.length; ++i) {
+            console.log(i)
+            let img = await fetch(`${base_api_url}/covers`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Client-ID': credentials.client_id,
+                    'Authorization': `Bearer ${credentials.access_token}`,
+                },
+                body: `fields url;where game = ${data[i].id};`
+            })
+            let imgJson = await img.json()
+            data[i].game_img1 = imgJson[0].url
+            console.log(data[i].game_img1)
+        }
+
         return data;
     }
 
@@ -41,7 +57,7 @@ module.exports = function (fetch, userException) {
         })
 
         const data = await response.json();
-        if (!data) {
+        if (!data || data.length === 0) {
             throw new userException("Unable to find game", 502)
         }
         return data;

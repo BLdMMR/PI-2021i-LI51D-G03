@@ -17,7 +17,7 @@ module.exports = function(igdb_data, covida_db, userException) {
                 statusCode: 400
             })
         else{
-            return igdb_data.searchGame(id);
+            return igdb_data.searchGame(parseInt(id));
         }
 
     }

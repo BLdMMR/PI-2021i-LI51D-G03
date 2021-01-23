@@ -8,12 +8,13 @@ module.exports =  function (fetch, esUrl, userException) {
     async function getAllGroups() {
         const response = await fetch(`${esUrl}/groups/_search`)
         const result = await response.json()
-        if (result.hits.hits.length <= 0)
+        if (result.hits.hits.length <= 0){
+            console.log('erro na db')
             return Promise.reject({
                 message: "There are no groups in database",
                 statusCode: 404
             })
-        else {
+        }else {
             let groupList = []
             result.hits.hits.forEach(group => groupList.push({
                 id: group._source.id,
