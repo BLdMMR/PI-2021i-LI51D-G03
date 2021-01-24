@@ -1,11 +1,11 @@
 body {
-    padding: 50px;
     font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
 #gameContainer {
     background-color: lightgray;
 }
+
 
 #img {
 
@@ -15,17 +15,43 @@ body {
     width: 20%;
 }
 
-#navbar {
-    background-color: #da2aa0;
-    background-size: auto;
+.container-fluid {
+    background-color: #01bff8;
+    padding: 1%;
     font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
 #navbar_txt {
     color: white;
+    font-weight: bold;
+    font-size:30px;
 }
 
 a {
     font: 14px "Calibri";
     color: #00B7FF;
 }
+
+#search-button {
+    background-color:white;
+    Border-color:#00B7FF;
+    color:#00B7FF;
+    margin-left:5px;
+}
+
+.carousel-inner {
+    z-index:-1;
+}
+
+.carousel-control-prev, .carousel-control-next {
+    z-index:1;
+    color:black;
+}
+
+.carousel-control-prev:hover, .carousel-control-next:hover {
+    color:white;
+    background-color:black;
+}
+
+
+

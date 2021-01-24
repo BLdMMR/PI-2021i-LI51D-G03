@@ -27,7 +27,6 @@ module.exports = function (fetch, userException) {
         }
 
         for(i = 0; i < data.length; ++i) {
-            console.log(i)
             let img = await fetch(`${base_api_url}/covers`, {
                 method: 'POST',
                 headers: {
@@ -39,6 +38,8 @@ module.exports = function (fetch, userException) {
             })
             let imgJson = await img.json()
             data[i].game_img1 = imgJson[0].url
+
+            data[0].first = true
             console.log(data[i].game_img1)
         }
 
