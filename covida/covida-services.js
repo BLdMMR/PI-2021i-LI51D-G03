@@ -1,10 +1,13 @@
 'use strict'
 
+const { response } = require("express")
+
 const MAXIMUM_RESULTS = 10000
 
-module.exports = function(igdb_data, covida_db, userException) {
+module.exports = function(igdb_data, covida_db, usersDb) {
     if (!igdb_data) throw "No web-api module found"
     if (!covida_db) throw "No covida_db module found"
+    if (!usersDb) throw "No usersDb module found"
 
     function getMostPopularGames() {
         return igdb_data.getMostPopularGames();
@@ -129,6 +132,26 @@ module.exports = function(igdb_data, covida_db, userException) {
             return covida_db.updateGroup(groupName, details)
     }
 
+    function verifyLoginCredentials(givenCredentials) {
+        return usersDb.getUser(givenCredentials.username)
+        .then(user => {
+            console.log(user)
+            console.log(givenCredentials.password, user.password)
+            if (!user || givenCredentials.password != user._source.password) {
+                return {validCredentials: false, error: 'Username or password invalid'}
+            } else {
+                return Promise.resolve({validCredentials: true})
+            }
+        })
+    }
+
+    function createUser(userCredentials) {
+        if (!userCredentials) {
+            return Promise.reject({message: 'No credentials given', statusCode: 400})
+        }
+        return usersDb.createUser(userCredentials.username, userCredentials.password)
+    }
+
     return {
         getMostPopularGames: getMostPopularGames,
         searchGame: searchGame,
@@ -139,7 +162,9 @@ module.exports = function(igdb_data, covida_db, userException) {
         removeGroup: removeGroup,
         addGameToGroup: addGameToGroup,
         removeGameFromGroup: removeGameFromGroup,
-        updateGroup: updateGroup
+        updateGroup: updateGroup,
+        verifyLoginCredentials: verifyLoginCredentials,
+        createUser: createUser
     }
 
 

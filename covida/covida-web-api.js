@@ -1,8 +1,10 @@
 'use strict'
 
 /** This is the only module that understands HTTP **/
+const express = require('express')
+const router = express.Router()
 
-module.exports = function(services, userException, router) {
+module.exports = function(services) {
     if (!services) throw "No services module found"
 
     function getMostPopularGames(req, rsp) {
@@ -148,18 +150,5 @@ module.exports = function(services, userException, router) {
     router.put('/api/groups/:id', updateGroup)
 
     return router
-
-    return {
-        getMostPopularGames: getMostPopularGames,
-        searchGame: searchGame,
-        getAllGroups: getAllGroups,
-        getGroupInfo: getGroupInfo,
-        getGamesFromGroupBasedOnRating: getGamesFromGroupBasedOnRating,
-        createGroup: createGroup,
-        removeGroup: removeGroup,
-        addGameToGroup: addGameToGroup,
-        removeGameFromGroup: removeGameFromGroup,
-        updateGroup: updateGroup
-    }
 
 }

@@ -1,6 +1,8 @@
 'use strict'
+const express = require('express')
+const router = express.Router()
 
-module.exports = function(services, router) {
+module.exports = function(services) {
 
       if (!services) {
             throw 'No services module found'
@@ -52,10 +54,9 @@ module.exports = function(services, router) {
                   
             })
             .catch(err => {
-                  if (err.status != undefined && err.message != undefined) rsp.status(err.status).json(err.message)
+                  if (err.status && err.message) rsp.status(err.status).json(err.message)
                   else {
-                        console.log('Fodeu para aqui')
-                        rsp.status(404).json("fodeu")
+                        rsp.status(404).json('Something happaned')
                   }
             })
       }
@@ -69,7 +70,7 @@ module.exports = function(services, router) {
             .catch(err => {
                   console.log('Error pá')
                   console.log(err)
-                  rsp.render('error', {message: 'Fodeu', statusCode:404})//status(err.statusCode).json(err.message)
+                  rsp.render('error', {message: 'Something happaned', statusCode:404})//status(err.statusCode).json(err.message)
             })
       }
 
