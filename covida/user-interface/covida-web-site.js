@@ -8,6 +8,8 @@ module.exports = function(services) {
             throw 'No services module found'
       }
 
+      let currGroups = []
+
       router.get('/home', loadHomePage)
       router.get('/popular', getMostPopularGames)
       router.get('/search', searchGame)
@@ -16,7 +18,7 @@ module.exports = function(services) {
       router.get('/groups/:id/games', getGamesFromGroupBasedOnRating)
       router.post('/groups', createGroup)
       router.delete('/groups/:id', removeGroup)
-      router.put('/groups/:id/games', addGameToGroup)
+      router.post('/groups/:id/games', addGameToGroup)
       router.put('/groups/:id/games/:gameid', removeGameFromGroup)
       router.put('/groups/:id', updateGroup)
 
@@ -25,19 +27,22 @@ module.exports = function(services) {
       function loadHomePage(req, rsp) {
             services.getMostPopularGames()
             .then(mpgames => {
-                  services.getAllGroups()
+                  services.getAllGroups(req, rsp, req.user.username)
                   .then(groups => { 
                         console.log(mpgames)
-                        rsp.render('groups', {games: mpgames, groups: groups})
+                        console.log(groups)
+                        console.log(req.user.username)
+                        currGroups = groups
+                        rsp.render('home', {games: mpgames, groups: groups})
                   })
             })
       }
 
       function getMostPopularGames(req, rsp) {
-            services.getMostPopularGames(/*req.user.username*/)
+            services.getMostPopularGames()
             .then((games) => {
                   console.log(games)
-                  rsp.render('groups', {username: "Banana On Crack"/*req.user.username*/, games: games})
+                  rsp.render('groups', {username: req.user.username, games: games})
             })
             .catch(err => {
                   rsp.status(err.statusCode).json(err.message)
@@ -49,7 +54,7 @@ module.exports = function(services) {
             .then(games => {
                   let game = games[0]
                   services.getAllGroups().then(groups => {
-                        rsp.render('gameDetails', {name: game.name, id: game.id, total_rating: game.total_rating, genres: game.genres, follows: game.follows, groups: groups})
+                        rsp.render('gameDetails', {name: game.name, id: game.id, total_rating: game.total_rating, genres: game.genres, follows: game.follows, groups: currGroups})
                   })
                   
             })
@@ -62,9 +67,11 @@ module.exports = function(services) {
       }
 
       function getAllGroups(req, rsp) {
-            services.getAllGroups(/*req.user.username*/)
+            services.getAllGroups(req.user.username)
             .then((groups) => {
                   console.log('Success')
+                  currGroups = groups
+                  console.log('groups: ', groups)
                   rsp.render('groups', {groups: groups})
             })
             .catch(err => {
@@ -75,7 +82,7 @@ module.exports = function(services) {
       }
 
       function getGroupInfo(req, rsp) {
-            services.getGroupInfo(req.params.id)
+            services.getGroupInfo(req.params.id, req.user.username)
             .then(group => {
                   rsp.render('groupDetails', {groupName: group.name, description: group.description, games: group.games})
             })
@@ -85,7 +92,7 @@ module.exports = function(services) {
       }
 
       function getGamesFromGroupBasedOnRating(req, rsp) {
-            services.getGamesFromGroupBasedOnRating(req.params.id, req.query)
+            services.getGamesFromGroupBasedOnRating(req.params.id, req.query, req.user.username)
             .then(gameList => {
                   rsp.render()
             })
@@ -93,9 +100,9 @@ module.exports = function(services) {
       }
 
       function createGroup(req, rsp) {
-            services.createGroup(req.body)
+            services.createGroup(req.body, req.user.username)
             .then(() => {
-                  rsp.redirect('/api/groups')
+                  rsp.redirect('/site/groups')
             })
             .catch(err => {
                   rsp.status(err.statusCode).json(err.message)
@@ -103,7 +110,7 @@ module.exports = function(services) {
       }
 
       function removeGroup(req, rsp) {
-            services.removeGroup(req.params.id)
+            services.removeGroup(req.params.id, req.user.username)
             .then(() => {
                   rsp.redirect('/api/groups')
             })
@@ -113,9 +120,9 @@ module.exports = function(services) {
       }
 
       function addGameToGroup(req, rsp) {
-            services.addGameToGroup(req.params.id, req.body)
+            services.addGameToGroup(req.params.id, req.body, req.user.username)
             .then(() => {
-                  rsp.redirect(`/api/groups/${req.params.id}`)
+                  rsp.redirect(`/site/groups/${req.params.id}`)
             })
             .catch(err => {
                   rsp.status(err.statusCode).json(err.message)
@@ -123,7 +130,7 @@ module.exports = function(services) {
       }
 
       function removeGameFromGroup(req, rsp) {
-            services.removeGameFromGroup(req.params.id, req.params.gameid)
+            services.removeGameFromGroup(req.params.id, req.params.gameid, req.user.username)
             .then(() => {
                   rsp.redirect(`/api/groups/${req.params.id}`)
             })
@@ -133,7 +140,7 @@ module.exports = function(services) {
       }
 
       function updateGroup(req, rsp) {
-            services.updateGroup(req.params.id, req.body)
+            services.updateGroup(req.params.id, req.body, req.user.username)
             .then(() => {
                   rsp.redirect(`/api/groups/${req.params.id}`)
             })

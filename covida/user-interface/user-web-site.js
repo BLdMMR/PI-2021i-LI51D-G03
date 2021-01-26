@@ -25,8 +25,6 @@ module.exports = function (services){
 /*             console.log('Random: ', services.verifyLoginCredentials(givenCredentials)) */            services.verifyLoginCredentials(givenCredentials)
             services.verifyLoginCredentials(givenCredentials)
             .then(status => {
-                  console.log(status)
-                  console.log(givenCredentials)
                   if (status.validCredentials) 
                         req.login( {username: givenCredentials.username, password: givenCredentials.password}, (err) => rsp.redirect('/site/home'))
                   else 
@@ -44,7 +42,7 @@ module.exports = function (services){
 
       function logoutRequest(req, rsp) {
             req.logout()
-            rsp.redirect('users/login')
+            rsp.redirect('/users/login')
       }
 
       function register(req, rsp) {
@@ -57,7 +55,6 @@ module.exports = function (services){
             .catch(err => {
                   if (err.statusCode && err.message) rsp.status(err.statusCode).json(err.message)
                   else {
-                        console.log(err)
                         rsp.status(400).json('Something Happened')
                   }
             })

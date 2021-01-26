@@ -24,7 +24,7 @@ module.exports = function (fetch, esUrl) {
                   return Promise.reject(
                         {message: 'Username or password invalid', statusCode: 400}
                   )
-            if (username === getUser(username).username)
+            if (username === getUser(username)._source.username)
                   return Promise.reject(
                         {message: 'Username already in use', statusCode: 400}
                   )

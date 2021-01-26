@@ -1,11 +1,11 @@
 'use strict'
 let groups = [];
 let last_idx = 0;
-module.exports =  function (fetch, esUrl, userException) {
+module.exports =  function (fetch, esUrl) {
     if (!fetch) throw 'No fetch module found'
 
     //PROMISED & WITH ES
-    async function getAllGroups() {
+    async function getAllGroups(username) {
         const response = await fetch(`${esUrl}/groups/_search`)
         const result = await response.json()
         if (result.hits.hits.length <= 0){
@@ -16,20 +16,20 @@ module.exports =  function (fetch, esUrl, userException) {
             })
         }else {
             let groupList = []
-            result.hits.hits.forEach(group => groupList.push({
+            result.hits.hits.forEach(group => {if (group._source.username === username) groupList.push({
                 id: group._source.id,
                 name: group._source.name,
                 description: group._source.description,
                 number_of_games: group._source.games.length
-            }))
+            })})
 
             return Promise.resolve(groupList)
         }
     }
 
     //PROMISED & WITH ES
-    async function getGroupInfo(groupId) {
-        const group = await findGroup(groupId)
+    async function getGroupInfo(groupId, username) {
+        const group = await findGroup(groupId, username)
         if (!group) {
             return Promise.reject({
                 message: `No group in database with the id ${groupId}`,
@@ -45,7 +45,7 @@ module.exports =  function (fetch, esUrl, userException) {
     }
 
     //PROMISED & WITH ES
-    async function createGroup(details) {
+    async function createGroup(details, username) {
         if (!details.name || !hasReadableCharacters(details.name))
 
             return Promise.reject(
@@ -69,6 +69,7 @@ module.exports =  function (fetch, esUrl, userException) {
             }
 
             let group = {
+                username: username,
                 id: last_idx,
                 name: details.name,
                 description: details.description,
@@ -89,8 +90,8 @@ module.exports =  function (fetch, esUrl, userException) {
 
     //PROMISED & WITH ES
     //TODO -> change so it displays the result updated. It's showing all groups with the removed group still in it
-    async function removeGroup(groupId) {
-        let groupToRemove = await findGroup(groupId)
+    async function removeGroup(groupId, username) {
+        let groupToRemove = await findGroup(groupId, username)
         if (!groupToRemove) {
             return Promise.reject({message: "No group in database with such id", statusCode: 404})
         }
@@ -109,7 +110,7 @@ module.exports =  function (fetch, esUrl, userException) {
     }
 
     //PROMISED & WITH ES
-    async function getGamesFromGroupBasedOnRating(groupId, min, max) {
+    async function getGamesFromGroupBasedOnRating(groupId, min, max, username) {
         if (min > max) {
             return Promise.reject({
                     message: "Minimum value bigger than maximum",
@@ -117,7 +118,7 @@ module.exports =  function (fetch, esUrl, userException) {
                 }
             )
         }
-        let group = await findGroup(groupId);
+        let group = await findGroup(groupId, username);
         if (!group)
             return Promise.reject({
                 message: `No group in database with name ${groupId}`,
@@ -134,8 +135,8 @@ module.exports =  function (fetch, esUrl, userException) {
     }
 
     //PROMISED & WITH ES
-    async function addGameToGroup(groupId, game) {
-        let group = await findGroup(groupId);
+    async function addGameToGroup(groupId, game, username) {
+        let group = await findGroup(groupId, username);
         if (!group) {
             return Promise.reject({
                 message:`No group in database with the id ${groupId}`,
@@ -162,8 +163,8 @@ module.exports =  function (fetch, esUrl, userException) {
     }
 
     //PROMISED & WITH ES
-    async function removeGameFromGroup(groupId, gameId) {
-        let group = await findGroup(groupId)
+    async function removeGameFromGroup(groupId, gameId, username) {
+        let group = await findGroup(groupId, username)
         if (!group) {
             return Promise.reject({
                 message:`No group in database with the id ${groupId}`,
@@ -187,8 +188,8 @@ module.exports =  function (fetch, esUrl, userException) {
     }
 
     //PROMISED & WITH ES
-    async function updateGroup(groupId, details) {
-        let group = await findGroup(groupId)
+    async function updateGroup(groupId, details, username) {
+        let group = await findGroup(groupId, username)
         if (!group) {
             return Promise.reject({
                 message: `No group in database with the name ${groupId}`,
@@ -226,11 +227,11 @@ module.exports =  function (fetch, esUrl, userException) {
      * @param id
      * @returns {*}
      */
-    async function findGroup(id, name) {
+    async function findGroup(id, username) {
         if (id != null) {
             const response = await fetch(`${esUrl}/groups/_search`)
             const result = await response.json()
-            return result.hits.hits.filter(element => element._source.id === parseInt(id))[0]
+            return result.hits.hits.filter(element => element._source.id === parseInt(id) && element._source.username === username)[0]
         }
     }
 

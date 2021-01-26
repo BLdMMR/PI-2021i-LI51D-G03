@@ -25,18 +25,18 @@ module.exports = function(igdb_data, covida_db, usersDb) {
 
     }
 
-    function getAllGroups() {
-        return covida_db.getAllGroups()
+    function getAllGroups(username) {
+        return covida_db.getAllGroups(username)
     }
 
-    function getGroupInfo(id) {
+    function getGroupInfo(id, username) {
         if (!id)
             return Promise.reject({
                 message: `No id given`,
                 statusCode: 400
             })
         else
-            return covida_db.getGroupInfo(id);
+            return covida_db.getGroupInfo(id, username);
     }
 
     function getGamesFromGroupBasedOnRating(id, details) {
@@ -59,20 +59,20 @@ module.exports = function(igdb_data, covida_db, usersDb) {
                 statusCode: 400
             })
         else
-            return covida_db.getGamesFromGroupBasedOnRating(id, min, max)
+            return covida_db.getGamesFromGroupBasedOnRating(id, min, max, username)
     }
 
-    function createGroup(group) {
+    function createGroup(group, username) {
         if (!group)
             return Promise.reject({
                 message: "No group details given",
                 statusCode: 400
             })
         else
-            return covida_db.createGroup(group)
+            return covida_db.createGroup(group, username)
     }
 
-    function removeGroup(groupId) {
+    function removeGroup(groupId, username) {
         if (!groupId) {
             Promise.reject({
                 message: "No group id given",
@@ -80,10 +80,10 @@ module.exports = function(igdb_data, covida_db, usersDb) {
             })
         }
         else
-            return covida_db.removeGroup(groupId)
+            return covida_db.removeGroup(groupId, username)
     }
 
-    function addGameToGroup(groupId, game) {
+    function addGameToGroup(groupId, game, username) {
         if (!groupId)
             return Promise.reject({
                 message: "No group id given",
@@ -95,12 +95,12 @@ module.exports = function(igdb_data, covida_db, usersDb) {
                 statusCode: 400
             })
         else{
-            return covida_db.addGameToGroup(groupId, game)
+            return covida_db.addGameToGroup(groupId, game, username)
         }
 
     }
 
-    function removeGameFromGroup(groupId, gameId) {
+    function removeGameFromGroup(groupId, gameId, username) {
         let id = parseInt(gameId)
         if (!groupId)
             return Promise.reject({
@@ -113,11 +113,11 @@ module.exports = function(igdb_data, covida_db, usersDb) {
                 statusCode: 400
             })
         else{
-            return covida_db.removeGameFromGroup(groupId, id)
+            return covida_db.removeGameFromGroup(groupId, id, username)
         }
     }
 
-    function updateGroup(groupName, details) {
+    function updateGroup(groupName, details, username) {
         if (!groupName)
             return Promise.reject({
                 message: "No group id given",
@@ -129,14 +129,12 @@ module.exports = function(igdb_data, covida_db, usersDb) {
                 statusCode: 400
             })
         else
-            return covida_db.updateGroup(groupName, details)
+            return covida_db.updateGroup(groupName, details, username)
     }
 
     function verifyLoginCredentials(givenCredentials) {
         return usersDb.getUser(givenCredentials.username)
         .then(user => {
-            console.log(user)
-            console.log(givenCredentials.password, user.password)
             if (!user || givenCredentials.password != user._source.password) {
                 return {validCredentials: false, error: 'Username or password invalid'}
             } else {
