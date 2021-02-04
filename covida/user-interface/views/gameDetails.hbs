@@ -1,17 +1,24 @@
 <div id="gameContainer">
       <img src="{{img_src}}" alt="">
       <h1>{{name}}</h1>
-      <h5>{{id}}</h5>
+      {{!-- <h5>{{id}}</h5> --}}
       <h4>{{genres}}</h4>
-      <h4>{{follows}}</h4>
+      {{!-- <h4>{{follows}}</h4> --}}
       <h4>{{total_rating}}</h4>
 </div>
-<div class="row">
+
+<h5 id="addToGroupButtons">Add Game to Group</h5>
+
+<div id="addToGroupButtons" class="row">
 {{#each groups}}
-      <form method="POST" action="/site/groups/{{id}}">
+      <form method="POST" action="/site/groups/{{id}}/games?_method=PUT">
             <div>
-                  <input type="checkbox" value="{{name}}" name="id">
-                  <button type="submit">Add Game to group</button>
+
+                  <input name="id" type="hidden" value="{{../id}}"/>
+                  <input name="name" type="hidden" value="{{../name}}">
+                  <input name="total_rating" type="hidden" value="{{../total_rating}}">
+
+                  <button type="submit">{{name}}</button>
             </div>
       </form>
 {{/each}}

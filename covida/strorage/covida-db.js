@@ -8,13 +8,12 @@ module.exports =  function (fetch, esUrl) {
     async function getAllGroups(username) {
         const response = await fetch(`${esUrl}/groups/_search`)
         const result = await response.json()
-        if (result.hits.hits.length <= 0){
+        /* if (result.hits.hits.length <= 0){
             console.log('erro na db')
-            return Promise.reject({
+            return Promise.resolve({
                 message: "There are no groups in database",
-                statusCode: 404
             })
-        }else {
+        }else { */
             let groupList = []
             result.hits.hits.forEach(group => {if (group._source.username === username) groupList.push({
                 id: group._source.id,
@@ -24,7 +23,7 @@ module.exports =  function (fetch, esUrl) {
             })})
 
             return Promise.resolve(groupList)
-        }
+        /* } */
     }
 
     //PROMISED & WITH ES
@@ -125,8 +124,9 @@ module.exports =  function (fetch, esUrl) {
                 statusCode: 404
             })
         else {
-            let retGames = group._source.games.filter(game => game.total_rating >= min && game.total_rating <= max);
-            if (retGames.length > 0) return Promise.resolve(retGames)
+            let retGroup = group
+            retGroup._source.games = group._source.games.filter(game => game.total_rating >= min && game.total_rating <= max);
+            if (retGroup._source.games.length > 0) return retGroup._source
             else return Promise.reject({
                 message: `No games in group with ratings withing the values ${min} and ${max}`,
                 statusCode: 404
@@ -149,6 +149,7 @@ module.exports =  function (fetch, esUrl) {
                     statusCode: 400
                 })
             else {
+                group._source.games.push(game)
                 await fetch(`${esUrl}/groups/_doc/${group._id}`, {
                     method: 'PUT',
                     headers: {'Content-Type': 'application/json'},
@@ -164,6 +165,7 @@ module.exports =  function (fetch, esUrl) {
 
     //PROMISED & WITH ES
     async function removeGameFromGroup(groupId, gameId, username) {
+        console.log(gameId instanceof String)
         let group = await findGroup(groupId, username)
         if (!group) {
             return Promise.reject({
@@ -171,13 +173,13 @@ module.exports =  function (fetch, esUrl) {
                 statusCode: 404
             })
         }
-        else if (!group._source.games.some(groupGame => gameId === groupGame.id))
+        else if (!group._source.games.some(groupGame => gameId == groupGame.id)){
             return Promise.reject({
                 message:`The group doesn't have a game with the id ${gameId}`,
                 statusCode:404
             })
-        else {
-            group._source.games = group._source.games.filter(game => game.id !== gameId);
+        } else {
+            group._source.games = group._source.games.filter(game => game.id != gameId);
             await fetch(`${esUrl}/groups/_doc/${group._id}`,{
                 method: 'PUT',
                 headers: {'Content-Type': 'application/json'},

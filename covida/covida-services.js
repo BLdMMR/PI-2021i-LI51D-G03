@@ -2,8 +2,6 @@
 
 const { response } = require("express")
 
-const MAXIMUM_RESULTS = 10000
-
 module.exports = function(igdb_data, covida_db, usersDb) {
     if (!igdb_data) throw "No web-api module found"
     if (!covida_db) throw "No covida_db module found"
@@ -20,9 +18,16 @@ module.exports = function(igdb_data, covida_db, usersDb) {
                 statusCode: 400
             })
         else{
-            return igdb_data.searchGame(parseInt(id));
+            return igdb_data.searchGame(id);
         }
 
+    }
+
+    function getGameDetails(id) {
+        if (!id) {
+            return Promise.reject()
+        }
+        return igdb_data.getGameDetails(id)
     }
 
     function getAllGroups(username) {
@@ -39,7 +44,7 @@ module.exports = function(igdb_data, covida_db, usersDb) {
             return covida_db.getGroupInfo(id, username);
     }
 
-    function getGamesFromGroupBasedOnRating(id, details) {
+    function getGamesFromGroupBasedOnRating(id, details, username) {
         const max = parseInt(details.max)
         const min = parseInt(details.min)
 
@@ -162,7 +167,8 @@ module.exports = function(igdb_data, covida_db, usersDb) {
         removeGameFromGroup: removeGameFromGroup,
         updateGroup: updateGroup,
         verifyLoginCredentials: verifyLoginCredentials,
-        createUser: createUser
+        createUser: createUser,
+        getGameDetails: getGameDetails
     }
 
 

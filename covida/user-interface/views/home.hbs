@@ -1,9 +1,12 @@
+<h3>Most Popular Games</h3>
 <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
   <div class="carousel-inner">
     {{#each games}}
-            <div class="carousel-item {{#if first}}active {{/if}}">
-                  <img src="{{game_img1}}" class="rounded" alt="{{name}}" id="img" >
-                  <a href="/search?id={{id}}" class="image-link">{{name}}</a>
+            <div class="carousel-item {{#if first}}active{{/if}}">
+                  <h4>{{name}}</h4>
+                  <a href="/site/games/{{id}}">
+                        <img src="{{game_img1}}" class="rounded" alt="{{name}}" id="img">
+                  </a>
             </div>
       {{/each}}
   </div>
@@ -28,8 +31,9 @@
                   <div class="card-body">
                         <h3 class="card-title"> {{name}}</h5>
                         <p class="card-text">{{description}}</p>
-                        <a href="#" class="card-link"><a href="groups/{{id}}">Details</a>
+                        <a class="card-link"><a href="groups/{{id}}">Details</a>
                   </div>
             </div>
       {{/each}}
       </div>
+</div>

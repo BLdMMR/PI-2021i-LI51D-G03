@@ -1,18 +1,37 @@
-<div>
-      <h1>{{groupName}}</h1>
+<div id="groupContainer">
+      <div class="row">
+            <h1>{{groupName}}</h1>
+            <form method="POST" action="{{id}}?_method=DELETE">
+                  <button type="submit">Delete group</button>
+            </form>
+      </div>
+       <form method="POST" action="/site/groups/{{id}}?_method=PUT">
+            <label for="name">Name</label>
+            <input type="text" name="name" id="name">
+            <label for="desc">Description</label>
+            <input type="text" name="description" id="desc">
+            <button type="submit">Update Group</button>
+      </form>      
+      <form method="GET" action="/site/groups/{{id}}/games">
+            <label for="min">Min</label>
+            <input type="text" name="min" id="min">
+            <label for="max">Max</label>
+            <input type="text" name="max" id="max">
+            <button type="submit">Get games based on rating</button>
+      </form>      
       <p>{{description}}</p>
-      <div class="accordion" id="groupGames">
+      <div id="groupGames">
+            <h4>Games:</h4>
             {{#each games}}
-                  <div class="accordion-item">
-                  <h2 class="accordion-header">
-                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                        {{name}}
-                        </button>
-                  </h2>
-                  <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-                        <div class="accordion-body">
-                        <strong>This is the first item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
-                        </div>
+                  <div class="row" id="gameFromGroup">
+                        <a href="/site/games/{{id}}">
+                              <button>
+                              {{name}}
+                              </button>
+                        </a>
+                        <form method="POST" action="{{../id}}/games/{{id}}?_method=DELETE">
+                              <button type="submit">x</button>
+                        </form>
                   </div>
             {{/each}}
       </div>

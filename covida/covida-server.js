@@ -15,6 +15,7 @@ const sitemap = require('express-sitemap-html')
 const cookieParser = require('cookie-parser')
 const passport = require('passport')
 const expressSession = require('express-session')
+const method_override = require('method-override')
 
 const userException = require('./userException')
 const igdb_data = require('./strorage/igdb-data')(fetch, userException);
@@ -29,7 +30,8 @@ console.log('All modules loaded')
 
 const app = express()
 
-
+app.use(cookieParser())
+app.use(method_override('_method'))
 app.use(expressSession({secret: "Sporting Campeão 2021"}))
 
 app.use(passport.initialize())
@@ -38,10 +40,10 @@ app.use(passport.session())
 passport.serializeUser(serializeUser)
 passport.deserializeUser(deserializeUser)
 
-//app.use(cookieParser)
 app.use(express.json())
 app.use(express.urlencoded())
 app.use(express.static(path.join(__dirname, 'user-interface', 'public')))
+
 
 app.set('views', path.join(__dirname, 'user-interface', 'views'))
 app.set('view engine', 'hbs')
@@ -59,7 +61,8 @@ function bla(req, rsp) {
 sitemap.swagger('COVIDA API', app)
 
 
-app.listen(PORT, console.log(`App listening on port ${PORT}`))
+app.listen(PORT, '127.0.0.1')
+console.log(`App listening on port ${PORT}`)
 
 function apiDesc(req, rsp) {
     console.log(req.path)

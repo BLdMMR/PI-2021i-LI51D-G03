@@ -4,11 +4,15 @@ body {
 
 #gameContainer {
     background-color: lightgray;
+    padding-left: 10%;
+    padding-top: 1%;
 }
 
+#addToGroupButtons {
+    padding-left: 10%;
+}
 
 #img {
-
     display: block;
     margin-left: auto;
     margin-right: auto;
@@ -16,7 +20,7 @@ body {
 }
 
 .container-fluid {
-    background-color: #01bff8;
+    background-color: #3746cc;
     padding: 1%;
     font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
@@ -29,12 +33,12 @@ body {
 
 a {
     font: 14px "Calibri";
-    color: #00B7FF;
+    color: #3455c4;
 }
 
 #navbar-button {
     background-color:white;
-    Border-color:#00B7FF;
+    Border-color:#2e6e88;
     color:#00B7FF;
     margin-left:5px;
 }
@@ -53,5 +57,18 @@ a {
     background-color:black;
 }
 
+#groupContainer {
+    padding-left: 10%;
+    padding-top: 1%;
+}
 
+#listOfSearchedGames {
+    padding-left: 10%;
+    padding-top: 0.5%;
+    border: gray;
+    border-bottom: grey;
+}
 
+#gameFromGroup {
+    padding-top: 1%;
+}
