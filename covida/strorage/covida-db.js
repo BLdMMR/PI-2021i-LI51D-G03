@@ -74,6 +74,7 @@ module.exports =  function (fetch, esUrl) {
                 description: details.description,
                 games: []
             }
+            if (details.games) group.games = details.games
 
             const response = await fetch(`${esUrl}/groups/_doc`, {
                 method:'POST',
@@ -220,7 +221,7 @@ module.exports =  function (fetch, esUrl) {
         removeGameFromGroup: removeGameFromGroup,
         updateGroup: updateGroup,
         getGamesFromGroupBasedOnRating: getGamesFromGroupBasedOnRating,
-        loadMock: loadMock
+        loadMockData: loadMockData
     }
 
     /**
@@ -239,8 +240,23 @@ module.exports =  function (fetch, esUrl) {
 
 
     //NOT WORKING PROPERLY, NO TIME TO FIX...
-    async function loadMock() {
-
+    async function loadMockData(groups, username) {
+        for(let i = 0; i < groups.length; ++i){
+            let group = groups[i]
+            if (await findGroup(group.id, username)) {
+                console.log("group found", findGroup(group.id, username))
+                continue;
+            }
+            const response = await fetch(`${esUrl}/groups/_doc`, {
+                method:'POST',
+                headers:{'Content-Type': 'application/json'},
+                body: JSON.stringify(group)
+            })
+            const result = response.json()
+            if (!result) return Promise.reject("Fetch result invalid")
+        }
+        return Promise.resolve(true);
+    }
         /*
         await createGroup({ name: "Best Games", description: "A group of great games"})
         await addGameToGroup(0, {id: 1020, name: "Grand Theft Auto V", follows: 1699, total_rating: 93.436101})
@@ -256,8 +272,6 @@ module.exports =  function (fetch, esUrl) {
         await addGameToGroup(1, {id: 1009, name: "The Last of Us", follows: 835, total_rating: 93.017695})
         await addGameToGroup(1, {id: 74, name: "Mass Effect 2", follows: 785, total_rating: 93.690090})
          */
-    }
-
 }
 
 /* Group Format

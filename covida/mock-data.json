@@ -1,0 +1,217 @@
+[
+    {
+        "id": 0,
+        "username": "admin@admin.adm",
+        "name": "Popular Games",
+        "description": "A group of great Games",
+        "games": [
+            {
+                "id": 1020,
+                "follows": 1714,
+                "genres": [
+                    5,
+                    10,
+                    14,
+                    31
+                ],
+                "name": "Grand Theft Auto V",
+                "total_rating": 93.30848430486171
+            },
+            {
+                "id": 1942,
+                "follows": 1483,
+                "genres": [
+                    12,
+                    31
+                ],
+                "name": "The Witcher 3: Wild Hunt",
+                "total_rating": 93.5810955703231
+            },
+            {
+                "id": 472,
+                "follows": 1031,
+                "genres": [
+                    12,
+                    31
+                ],
+                "name": "The Elder Scrolls V: Skyrim",
+                "total_rating": 91.9259157911386
+            },
+            {
+                "id": 732,
+                "follows": 957,
+                "genres": [
+                    5,
+                    10,
+                    31
+                ],
+                "name": "Grand Theft Auto: San Andreas",
+                "total_rating": 91.71587989791419
+            },
+            {
+                "id": 72,
+                "follows": 951,
+                "genres": [
+                    5,
+                    8,
+                    9,
+                    31
+                ],
+                "name": "Portal 2",
+                "total_rating": 91.92002642539664
+            },
+            {
+                "id": 1877,
+                "follows": 947,
+                "genres": [
+                    12
+                ],
+                "name": "Cyberpunk 2077",
+                "total_rating": 74.1597212155848
+            },
+            {
+                "id": 233,
+                "follows": 890,
+                "genres": [
+                    5
+                ],
+                "name": "Half-Life 2",
+                "total_rating": 91.0185053812521
+            },
+            {
+                "id": 71,
+                "follows": 887,
+                "genres": [
+                    5,
+                    8,
+                    9
+                ],
+                "name": "Portal",
+                "total_rating": 83.44960549430411
+            },
+            {
+                "id": 1009,
+                "follows": 838,
+                "genres": [
+                    5,
+                    31
+                ],
+                "name": "The Last of Us",
+                "total_rating": 92.7474954066648
+            },
+            {
+                "id": 74,
+                "follows": 787,
+                "genres": [
+                    5,
+                    12,
+                    13
+                ],
+                "name": "Mass Effect 2",
+                "total_rating": 93.58013448264109
+            }
+        ]
+    }
+    , 
+    {
+        "id": 1,
+        "name": "Unpopular Games",
+        "username": "admin@admin.adm",
+        "description": "A group of unpopular Games",
+        "games": [
+            {
+                "id": 33,
+                "follows": 1,
+                "genres": [
+                    2,
+                    31
+                ],
+                "name": "Space Quest 6: The Spinal Frontier",
+                "total_rating": 80.0
+            },
+            {
+                "id": 69,
+                "follows": 1,
+                "genres": [
+                    15,
+                    16
+                ],
+                "name": "Master of Orion III",
+                "total_rating": 57.0446403659479
+            },
+            {
+                "id": 110,
+                "follows": 1,
+                "genres": [
+                    2,
+                    31
+                ],
+                "name": "Freddy Pharkas: Frontier Pharmacist"
+            },
+            {
+                "id": 143,
+                "follows": 1,
+                "genres": [
+                    5,
+                    10
+                ],
+                "name": "Star Wars: Demolition",
+                "total_rating": 40.0
+            },
+            {
+                "id": 146,
+                "follows": 1,
+                "genres": [
+                    12
+                ],
+                "name": "Star Wars Galaxies: Rage of the Wookiees"
+            },
+            {
+                "id": 147,
+                "follows": 1,
+                "genres": [
+                    12,
+                    13
+                ],
+                "name": "Star Wars Galaxies: Jump to Lightspeed",
+                "total_rating": 74.5
+            },
+            {
+                "id": 159,
+                "follows": 1,
+                "genres": [
+                    11,
+                    15
+                ],
+                "name": "Star Wars: Force Commander"
+            },
+            {
+                "id": 161,
+                "follows": 1,
+                "genres": [
+                    5
+                ],
+                "name": "Star Wars: Rebel Assault",
+                "total_rating": 72.14230103752621
+            },
+            {
+                "id": 172,
+                "follows": 1,
+                "genres": [
+                    13
+                ],
+                "name": "Star Wars: X-Wing vs. TIE Fighter - Balance of Power",
+                "total_rating": 60.0
+            },
+            {
+                "id": 185,
+                "follows": 1,
+                "genres": [
+                    8
+                ],
+                "name": "Indiana Jones and the Last Crusade: The Action Game",
+                "total_rating": 75.9624015954772
+            }
+        ]
+    }
+]

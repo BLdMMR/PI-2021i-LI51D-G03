@@ -6,12 +6,13 @@ module.exports = function (fetch, esUrl) {
       async function getUser(username) {
             const fetchedRes = await fetch(`${esUrl}/users/_search`)
             const result = await fetchedRes.json()
-
             if (result.hits.hits.length > 0) {
                   let user = result.hits.hits.find(element => element._source.username === username)
                   return user
             }
-            else return null
+            else {
+                  return null
+            }
       }
 
       function hasReadableCharacters(groupName) {
@@ -20,14 +21,21 @@ module.exports = function (fetch, esUrl) {
 
       async function createUser(username, password) {
             console.log("username: ", username)
-            if (!username && !password && !(hasReadableCharacters(username))) 
+            console.log("password: ", password)
+            if (!username && !password && !(hasReadableCharacters(username))){ 
                   return Promise.reject(
                         {message: 'Username or password invalid', statusCode: 400}
                   )
-            if (username === getUser(username)._source.username)
-                  return Promise.reject(
-                        {message: 'Username already in use', statusCode: 400}
-                  )
+            }
+            const userdb = await getUser(username) 
+            console.log(userdb == null)
+            if (userdb != null){
+                  if (username == userdb._source.username && userdb._source.username != null){
+                        return Promise.reject(
+                              {message: 'Username already in use', statusCode: 400}
+                        )
+                  }
+            }
             const fetchedRes = await fetch(`${esUrl}/users/_doc`, {
                   method:'POST',
                   headers:{'Content-Type': 'application/json'},
@@ -35,6 +43,7 @@ module.exports = function (fetch, esUrl) {
             })
 
             const result = await fetchedRes.json()
+            console.log(result)
             return !result ? Promise.reject({message: 'Unable to create user', statusCode: 500}) : result 
       }
 

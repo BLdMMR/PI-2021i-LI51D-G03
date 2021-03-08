@@ -1,6 +1,7 @@
 'use strict'
 
 const { response } = require("express")
+const covidaDb = require("./strorage/covida-db")
 
 module.exports = function(igdb_data, covida_db, usersDb) {
     if (!igdb_data) throw "No web-api module found"
@@ -155,6 +156,10 @@ module.exports = function(igdb_data, covida_db, usersDb) {
         return usersDb.createUser(userCredentials.username, userCredentials.password)
     }
 
+    function loadMockData(groups, username) {
+        return covida_db.loadMockData(groups, username);
+    }
+
     return {
         getMostPopularGames: getMostPopularGames,
         searchGame: searchGame,
@@ -168,7 +173,8 @@ module.exports = function(igdb_data, covida_db, usersDb) {
         updateGroup: updateGroup,
         verifyLoginCredentials: verifyLoginCredentials,
         createUser: createUser,
-        getGameDetails: getGameDetails
+        getGameDetails: getGameDetails,
+        loadMockData: loadMockData
     }
 
 

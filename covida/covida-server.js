@@ -1,6 +1,6 @@
 'use strict'
 //Aplication running uses port 8080 or specified port
-const PORT = process.argv[2] || 8080
+const PORT = process.argv[3] || 8080
 
 
 const ES_HOST = 'localhost'
@@ -16,6 +16,7 @@ const cookieParser = require('cookie-parser')
 const passport = require('passport')
 const expressSession = require('express-session')
 const method_override = require('method-override')
+const fs = require('fs');
 
 const userException = require('./userException')
 const igdb_data = require('./strorage/igdb-data')(fetch, userException);
@@ -54,12 +55,13 @@ app.use('/api', web_api_router)
 app.use('/site', VerifyAuthentication, web_site_router)
 app.use('/users', user_web_site_router)
 
-function bla(req, rsp) {
-    console.log('Oh hi Mark')
-}
-
 sitemap.swagger('COVIDA API', app)
 
+if (process.argv[2] == 'mock') {
+    console.log("mock req")
+    loadMockData();
+    
+}
 
 app.listen(PORT, '127.0.0.1')
 console.log(`App listening on port ${PORT}`)
@@ -94,6 +96,19 @@ function VerifyAuthentication(req, rsp, next) {
 console.log('end of server')
 
 
-
-
-
+function loadMockData() {
+    user_db.createUser("admin@admin.adm", "admin");
+    fs.readFile("./mock-data.json", (err, data) => {
+        if (err) throw err;
+        let groups = JSON.parse(data);
+        
+        services.loadMockData(groups, 'admin@admin.adm')
+        .then(data => {
+            console.log('Mock data loaded successfully');
+        })
+        .catch(err => {
+            console.log(err);
+        });
+        
+    })
+}

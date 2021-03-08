@@ -147,10 +147,11 @@ module.exports = function(services) {
 
       function removeGameFromGroup(req, rsp) {
             services.removeGameFromGroup(req.params.id, req.params.gameid, req.user.username)
-            .then(() => {
-                  rsp.redirect(`/site/groups/${req.params.id}`)
+            .then(data => {
+                  rsp.redirect(`/site/groups/${data.id}`)
             })
             .catch(err => {
+                  rsp.render('error', {message: err.message, statusCode: err.statusCode})
                   rsp.status(err.statusCode).json(err.message)
             })
       }
